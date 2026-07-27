@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#5f0014">
+  <title>Banette Display Entreprise</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="screen-page">
+  <main class="display">
+    <header class="topbar">
+      <section class="brand-area">
+        <img id="brandLogo" src="assets/logo-placeholder.svg" alt="Logo de la boutique">
+        <div>
+          <div id="brandName" class="brand-name">Votre Artisan Boulanger</div>
+          <div id="brandSubtitle" class="brand-subtitle">Banette Combourg</div>
+        </div>
+      </section>
+      <section id="widgetsBar" class="widgets-bar" aria-label="Informations"></section>
+    </header>
+
+    <nav id="categoryBar" class="category-bar" aria-label="Catégories"></nav>
+
+    <section class="stage">
+      <div id="slideBackground" class="slide-background"></div>
+      <div class="slide-shade"></div>
+      <img id="imageMedia" class="media-layer hidden" alt="">
+      <video id="videoMedia" class="media-layer hidden" muted playsinline></video>
+
+      <article id="slideCard" class="slide-card">
+        <div id="badge" class="slide-badge hidden"></div>
+        <h1 id="title">Bienvenue</h1>
+        <p id="text">Votre écran boutique est prêt.</p>
+        <div id="price" class="slide-price hidden"></div>
+      </article>
+
+      <div id="offline" class="offline hidden">Mode hors connexion</div>
+    </section>
+
+    <footer class="ticker-wrap">
+      <div id="ticker" class="ticker">Bienvenue dans votre boulangerie artisanale.</div>
+    </footer>
+  </main>
+  <script type="module" src="screen.js"></script>
+</body>
+</html>

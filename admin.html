@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#5f0014">
+  <title>Administration — Banette Display</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="admin-page">
+  <header class="admin-header">
+    <div>
+      <h1>Banette Display Entreprise</h1>
+      <p>Gestion à distance — Cloudinary + Firebase</p>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" target="_blank" rel="noopener" class="btn secondary">Voir l’écran</a>
+      <button id="logoutButton" class="btn danger hidden" type="button">Déconnexion</button>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <section id="loginPanel" class="card login-card">
+      <h2>Accès sécurisé</h2>
+      <form id="loginForm" class="form-grid">
+        <label>Adresse e-mail
+          <input id="loginEmail" type="email" required autocomplete="email">
+        </label>
+        <label>Mot de passe
+          <input id="loginPassword" type="password" required autocomplete="current-password">
+        </label>
+        <button class="btn primary" type="submit">Se connecter</button>
+        <div id="loginStatus" class="status" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <section id="appPanel" class="hidden">
+      <nav class="tabs">
+        <button class="tab active" data-tab="dashboard" type="button">Tableau de bord</button>
+        <button class="tab" data-tab="categories" type="button">Onglets</button>
+        <button class="tab" data-tab="media" type="button">Photos & vidéos</button>
+        <button class="tab" data-tab="widgets" type="button">Widgets</button>
+        <button class="tab" data-tab="urgent" type="button">Information principale</button>
+        <button class="tab" data-tab="settings" type="button">Réglages</button>
+        <button class="tab" data-tab="security" type="button">Sécurité</button>
+      </nav>
+
+      <section id="tab-dashboard" class="tab-panel active">
+        <div class="metrics">
+          <article class="metric-card"><span>Onglets</span><strong id="metricCategories">0</strong></article>
+          <article class="metric-card"><span>Médias</span><strong id="metricMedia">0</strong></article>
+          <article class="metric-card"><span>Widgets</span><strong id="metricWidgets">0</strong></article>
+          <article class="metric-card"><span>Cloudinary</span><strong>Prêt</strong></article>
+        </div>
+        <div class="card">
+          <h2>Stockage gratuit activé</h2>
+          <p>Les photos, vidéos et logos sont envoyés dans Cloudinary. Les onglets, réglages et programmations sont enregistrés dans Firestore.</p>
+        </div>
+      </section>
+
+      <section id="tab-categories" class="tab-panel">
+        <div class="card">
+          <h2>Créer ou modifier un onglet</h2>
+          <form id="categoryForm" class="form-grid two-cols">
+            <input id="categoryId" type="hidden">
+            <label>Nom de l’onglet
+              <input id="categoryName" type="text" required placeholder="Pains, Viennoiseries, Glaces…">
+            </label>
+            <label>Icône ou emoji
+              <input id="categoryIcon" type="text" maxlength="4" placeholder="🥖">
+            </label>
+            <label>Couleur
+              <input id="categoryColor" type="color" value="#5f0014">
+            </label>
+            <label>Durée de l’onglet (secondes)
+              <input id="categoryDuration" type="number" min="10" max="3600" value="60">
+            </label>
+            <label class="check-row full"><input id="categoryEnabled" type="checkbox" checked> Onglet actif</label>
+            <div class="form-actions full">
+              <button class="btn primary" type="submit">Enregistrer</button>
+              <button id="newCategoryButton" class="btn secondary" type="button">Nouveau</button>
+            </div>
+            <div id="categoryStatus" class="status full"></div>
+          </form>
+        </div>
+        <div class="card">
+          <h2>Onglets existants</h2>
+          <div id="categoryList" class="item-list"></div>
+        </div>
+      </section>
+
+      <section id="tab-media" class="tab-panel">
+        <div class="card">
+          <h2>Ajouter une photo, une vidéo ou un message</h2>
+          <form id="mediaForm" class="form-grid two-cols">
+            <input id="mediaId" type="hidden">
+            <label>Onglet
+              <select id="mediaCategory" required></select>
+            </label>
+            <label>Type
+              <select id="mediaType">
+                <option value="image">Photo</option>
+                <option value="video">Vidéo</option>
+                <option value="message">Message</option>
+              </select>
+            </label>
+            <label class="full">Titre
+              <input id="mediaTitle" type="text" maxlength="120">
+            </label>
+            <label class="full">Texte
+              <textarea id="mediaText" rows="3" maxlength="700"></textarea>
+            </label>
+            <label>Badge
+              <input id="mediaBadge" type="text" maxlength="40" placeholder="NOUVEAUTÉ">
+            </label>
+            <label>Prix
+              <input id="mediaPrice" type="text" maxlength="30" placeholder="4,90 €">
+            </label>
+            <label>Durée (secondes)
+              <input id="mediaDuration" type="number" min="3" max="600" value="10">
+            </label>
+            <label>Affichage
+              <select id="mediaFit">
+                <option value="cover">Plein écran</option>
+                <option value="contain">Image entière</option>
+              </select>
+            </label>
+            <label class="full">Choisir une photo ou une vidéo
+              <input id="mediaFile" type="file" accept="image/*,video/mp4,video/webm,video/quicktime">
+              <small>Envoi automatique vers Cloudinary.</small>
+            </label>
+            <label class="full">Ou utiliser une URL publique
+              <input id="mediaUrl" type="url" placeholder="https://...">
+            </label>
+            <label>Début de diffusion
+              <span class="date-wrap"><input id="mediaStart" type="datetime-local"></span>
+            </label>
+            <label>Fin de diffusion
+              <span class="date-wrap"><input id="mediaEnd" type="datetime-local"></span>
+            </label>
+            <label>Couleur de fond
+              <input id="mediaBackground" type="color" value="#5f0014">
+            </label>
+            <label>Couleur du texte
+              <input id="mediaTextColor" type="color" value="#ffffff">
+            </label>
+            <label class="check-row full"><input id="mediaEnabled" type="checkbox" checked> Contenu actif</label>
+            <div class="form-actions full">
+              <button class="btn primary" type="submit">Enregistrer</button>
+              <button id="newMediaButton" class="btn secondary" type="button">Nouveau</button>
+            </div>
+            <progress id="uploadProgress" class="full hidden" value="0" max="100"></progress>
+            <div id="mediaStatus" class="status full"></div>
+          </form>
+        </div>
+        <div class="card">
+          <h2>Contenus enregistrés</h2>
+          <label class="filter">Filtrer par onglet
+            <select id="mediaFilter"><option value="">Tous</option></select>
+          </label>
+          <div id="mediaList" class="item-list"></div>
+        </div>
+      </section>
+
+      <section id="tab-widgets" class="tab-panel">
+        <div class="card">
+          <h2>Ajouter un widget</h2>
+          <form id="widgetForm" class="form-grid two-cols">
+            <input id="widgetId" type="hidden">
+            <label>Type
+              <select id="widgetType">
+                <option value="clock">Heure</option>
+                <option value="date">Date</option>
+                <option value="weather">Météo</option>
+                <option value="ephemeris">Éphéméride</option>
+                <option value="appointment">Rendez-vous</option>
+                <option value="info">Information</option>
+              </select>
+            </label>
+            <label>Titre
+              <input id="widgetTitle" type="text" maxlength="60">
+            </label>
+            <label class="full">Texte personnalisé
+              <textarea id="widgetText" rows="2" maxlength="250"></textarea>
+            </label>
+            <label>Icône
+              <input id="widgetIcon" type="text" maxlength="4" placeholder="☀️">
+            </label>
+            <label class="check-row"><input id="widgetEnabled" type="checkbox" checked> Widget actif</label>
+            <div class="form-actions full">
+              <button class="btn primary" type="submit">Enregistrer</button>
+              <button id="newWidgetButton" class="btn secondary" type="button">Nouveau</button>
+            </div>
+            <div id="widgetStatus" class="status full"></div>
+          </form>
+        </div>
+        <div class="card">
+          <h2>Widgets existants</h2>
+          <div id="widgetList" class="item-list"></div>
+        </div>
+      </section>
+
+      <section id="tab-urgent" class="tab-panel">
+        <div class="card">
+          <h2>Information principale prioritaire</h2>
+          <form id="urgentForm" class="form-grid two-cols">
+            <label class="full">Titre
+              <input id="urgentTitle" type="text" maxlength="120">
+            </label>
+            <label class="full">Message
+              <textarea id="urgentText" rows="5" maxlength="700"></textarea>
+            </label>
+            <label class="full">Image de fond
+              <input id="urgentFile" type="file" accept="image/*">
+            </label>
+            <label class="full">Ou URL de l’image
+              <input id="urgentUrl" type="url">
+            </label>
+            <label>Couleur de fond
+              <input id="urgentBackground" type="color" value="#5f0014">
+            </label>
+            <label>Couleur du texte
+              <input id="urgentColor" type="color" value="#ffffff">
+            </label>
+            <label class="check-row full"><input id="urgentEnabled" type="checkbox"> Afficher immédiatement</label>
+            <button class="btn primary" type="submit">Enregistrer</button>
+            <div id="urgentStatus" class="status"></div>
+          </form>
+        </div>
+      </section>
+
+      <section id="tab-settings" class="tab-panel">
+        <div class="card">
+          <h2>Apparence générale</h2>
+          <form id="settingsForm" class="form-grid two-cols">
+            <label>Nom de la boutique
+              <input id="shopName" type="text">
+            </label>
+            <label>Sous-titre
+              <input id="shopSubtitle" type="text">
+            </label>
+            <label class="full">Choisir un logo
+              <input id="logoFile" type="file" accept="image/*">
+            </label>
+            <label class="full">Ou URL du logo
+              <input id="logoUrl" type="url">
+            </label>
+            <label>Couleur principale
+              <input id="primaryColor" type="color" value="#5f0014">
+            </label>
+            <label>Couleur secondaire
+              <input id="secondaryColor" type="color" value="#f0c36b">
+            </label>
+            <label class="full">Bandeau défilant
+              <input id="tickerText" type="text" maxlength="300">
+            </label>
+            <label>Vitesse du bandeau
+              <input id="tickerSpeed" type="number" min="10" max="180" value="35">
+            </label>
+            <label>Ville météo
+              <input id="weatherCity" type="text" value="Combourg">
+            </label>
+            <label>Latitude
+              <input id="weatherLat" type="number" step="0.0001" value="48.4089">
+            </label>
+            <label>Longitude
+              <input id="weatherLon" type="number" step="0.0001" value="-1.7517">
+            </label>
+            <label>Durée par défaut
+              <input id="defaultDuration" type="number" min="3" max="600" value="10">
+            </label>
+            <button class="btn primary" type="submit">Enregistrer</button>
+            <div id="settingsStatus" class="status"></div>
+          </form>
+        </div>
+      </section>
+
+      <section id="tab-security" class="tab-panel">
+        <div class="card">
+          <h2>Modifier le mot de passe</h2>
+          <form id="passwordForm" class="form-grid">
+            <label>Nouveau mot de passe
+              <input id="newPassword" type="password" minlength="8" required>
+            </label>
+            <label>Confirmer
+              <input id="confirmPassword" type="password" minlength="8" required>
+            </label>
+            <button class="btn primary" type="submit">Modifier le mot de passe</button>
+            <div id="passwordStatus" class="status"></div>
+          </form>
+        </div>
+      </section>
+    </section>
+  </main>
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
