@@ -1,5 +1,5 @@
-export const firebaseConfig = {
-  apiKey: "AIzaSyAi6jYUJhy7eW-35TLqJ3J9tuwaYdCwve8",
+firebaseConfig = {
+  apiKey: "AIzaSyAi6jYUJYh7eW-35TLqJ3J9tuwaYdCwve8",
   authDomain: "banette-display-c5ecd.firebaseapp.com",
   projectId: "banette-display-c5ecd",
   storageBucket: "banette-display-c5ecd.firebasestorage.app",
