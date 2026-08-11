@@ -1,4 +1,4 @@
-# Banette Display V4.2 — Netlify + Firebase + Cloudinary
+# Banette Display V4.3 — Netlify + Firebase + Cloudinary
 
 Cette version remplace Firebase Storage par Cloudinary.
 
@@ -50,3 +50,9 @@ Pour limiter les abus dans Cloudinary, il est conseillé de régler le preset av
 - dossier fixe `banette-display`.
 
 Ne communiquez jamais une clé API secrète Cloudinary.
+
+
+## V4.3
+- Titre caché sur écran pour photos/vidéos.
+- Image entière par défaut.
+- Suppression immédiate Firestore + tentative suppression Cloudinary via delete token.

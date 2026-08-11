@@ -104,8 +104,9 @@
                 <option value="message">Message</option>
               </select>
             </label>
-            <label class="full">Titre
-              <input id="mediaTitle" type="text" maxlength="120">
+            <label class="full">Nom interne du contenu
+              <input id="mediaTitle" type="text" maxlength="120" placeholder="Ex. Baba au rhum — non affiché sur l’écran">
+              <small>Ce nom sert uniquement dans l’administration et ne s’affiche pas sur l’écran pour les photos et vidéos.</small>
             </label>
             <label class="full">Texte
               <textarea id="mediaText" rows="3" maxlength="700"></textarea>
@@ -121,8 +122,8 @@
             </label>
             <label>Affichage
               <select id="mediaFit">
+                <option value="contain" selected>Image entière</option>
                 <option value="cover">Plein écran</option>
-                <option value="contain">Image entière</option>
               </select>
             </label>
             <label class="full">Choisir une photo ou une vidéo
