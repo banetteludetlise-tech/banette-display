@@ -1,35 +1,7 @@
 {
   "port": "SAINT-MALO",
-  "fetchedAt": "2026-09-27T18:59:16.962Z",
+  "fetchedAt": "2026-09-27T23:47:48.395Z",
   "events": [
-    {
-      "date": "2026-09-27",
-      "time": "02:56",
-      "type": "low",
-      "height": 1.58,
-      "coefficient": null
-    },
-    {
-      "date": "2026-09-27",
-      "time": "08:20",
-      "type": "high",
-      "height": 12.15,
-      "coefficient": 95
-    },
-    {
-      "date": "2026-09-27",
-      "time": "15:14",
-      "type": "low",
-      "height": 1.62,
-      "coefficient": null
-    },
-    {
-      "date": "2026-09-27",
-      "time": "20:37",
-      "type": "high",
-      "height": 12.5,
-      "coefficient": 97
-    },
     {
       "date": "2026-09-28",
       "time": "03:34",
@@ -189,6 +161,34 @@
       "time": "19:00",
       "type": "low",
       "height": 4,
+      "coefficient": null
+    },
+    {
+      "date": "2026-10-04",
+      "time": "00:40",
+      "type": "high",
+      "height": 9.37,
+      "coefficient": 46
+    },
+    {
+      "date": "2026-10-04",
+      "time": "07:29",
+      "type": "low",
+      "height": 4.51,
+      "coefficient": null
+    },
+    {
+      "date": "2026-10-04",
+      "time": "13:14",
+      "type": "high",
+      "height": 9.27,
+      "coefficient": 41
+    },
+    {
+      "date": "2026-10-04",
+      "time": "20:20",
+      "type": "low",
+      "height": 4.6,
       "coefficient": null
     }
   ]
