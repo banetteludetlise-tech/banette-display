@@ -1,5 +1,9 @@
 import { firebaseConfig } from "./firebase-config.js";
 import { cloudinaryConfig } from "./cloudinary-config.js";
+import {startTides, renderTides} from "./tides.js";
+import {tideConfig} from "./tide-model.js";
+import {weatherService,renderWeather} from "./weather.js";
+import {weatherConfig} from "./weather-model.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { getFirestore, collection, doc, addDoc, setDoc, deleteDoc, getDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
@@ -7,6 +11,7 @@ import { getFirestore, collection, doc, addDoc, setDoc, deleteDoc, getDoc, onSna
 const firebaseApp=initializeApp(firebaseConfig),auth=getAuth(firebaseApp),db=getFirestore(firebaseApp);
 const $=s=>document.querySelector(s);
 let categories=[],media=[],widgets=[],unsubs=[];
+let tideSettings=tideConfig(),stopTides=null,stopWeather=null;
 
 function status(el,msg,ok=true){el.textContent=msg;el.className=`status ${ok?"ok":"error"}`}
 function esc(v=""){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
@@ -41,23 +46,23 @@ async function deleteCloudinaryWithToken(item){
 
 $("#loginForm").addEventListener("submit",async e=>{e.preventDefault();try{await signInWithEmailAndPassword(auth,$("#loginEmail").value.trim(),$("#loginPassword").value);status($("#loginStatus"),"Connexion réussie.")}catch(err){status($("#loginStatus"),"Connexion impossible. Vérifiez vos identifiants.",false);console.error(err)}});
 $("#logoutButton").addEventListener("click",()=>signOut(auth));
-onAuthStateChanged(auth,user=>{$("#loginPanel").classList.toggle("hidden",!!user);$("#appPanel").classList.toggle("hidden",!user);$("#logoutButton").classList.toggle("hidden",!user);unsubs.forEach(f=>f());unsubs=[];if(user)startListeners()});
+onAuthStateChanged(auth,user=>{$("#loginPanel").classList.toggle("hidden",!!user);$("#appPanel").classList.toggle("hidden",!user);$("#logoutButton").classList.toggle("hidden",!user);unsubs.forEach(f=>f());unsubs=[];stopTides?.();stopWeather?.();stopTides=null;stopWeather=null;if(user){startListeners();stopTides=startTides(()=>renderTides($("#dashboardTides")));stopWeather=weatherService.subscribe(()=>renderWeather($("#adminWeatherPreview"),weatherFormConfig()))}});
 document.querySelectorAll(".tab").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".tab-panel").forEach(x=>x.classList.remove("active"));btn.classList.add("active");$(`#tab-${btn.dataset.tab}`).classList.add("active")}));
 
-$("#categoryForm").addEventListener("submit",async e=>{e.preventDefault();try{const id=$("#categoryId").value,data={name:$("#categoryName").value.trim(),icon:$("#categoryIcon").value.trim(),color:$("#categoryColor").value,duration:Number($("#categoryDuration").value||60),enabled:$("#categoryEnabled").checked,updatedAt:serverTimestamp(),cloudinaryDeleteToken:window.__lastCloudUpload?.deleteToken||"",cloudinaryPublicId:window.__lastCloudUpload?.publicId||"",cloudinaryResourceType:window.__lastCloudUpload?.resourceType||""};window.__lastCloudUpload=null;if(id)await setDoc(doc(db,"categories",id),data,{merge:true});else await addDoc(collection(db,"categories"),{...data,order:categories.length+1,createdAt:serverTimestamp()});status($("#categoryStatus"),"Onglet enregistré.");resetCategory()}catch(err){status($("#categoryStatus"),"Erreur d’enregistrement.",false);console.error(err)}});
+$("#categoryForm").addEventListener("submit",async e=>{e.preventDefault();try{const id=$("#categoryId").value,data={name:$("#categoryName").value.trim(),icon:$("#categoryIcon").value.trim(),color:$("#categoryColor").value,duration:Number($("#categoryDuration").value||60),enabled:$("#categoryEnabled").checked,updatedAt:serverTimestamp()};if(id)await setDoc(doc(db,"categories",id),data,{merge:true});else await addDoc(collection(db,"categories"),{...data,order:categories.length+1,createdAt:serverTimestamp()});status($("#categoryStatus"),"Onglet enregistré.");resetCategory()}catch(err){status($("#categoryStatus"),"Erreur d’enregistrement.",false);console.error(err)}});
 $("#newCategoryButton").addEventListener("click",resetCategory);
 function resetCategory(){$("#categoryForm").reset();$("#categoryId").value="";$("#categoryColor").value="#5f0014";$("#categoryDuration").value=60;$("#categoryEnabled").checked=true}
 function editCategory(id){const c=categories.find(x=>x.id===id);if(!c)return;$("#categoryId").value=c.id;$("#categoryName").value=c.name||"";$("#categoryIcon").value=c.icon||"";$("#categoryColor").value=c.color||"#5f0014";$("#categoryDuration").value=c.duration||60;$("#categoryEnabled").checked=c.enabled!==false;window.scrollTo({top:0,behavior:"smooth"})}
 async function removeCategory(id){if(confirm("Supprimer cet onglet ?"))await deleteDoc(doc(db,"categories",id))}
 
-$("#mediaForm").addEventListener("submit",async e=>{e.preventDefault();try{const id=$("#mediaId").value,file=$("#mediaFile").files[0];let url=$("#mediaUrl").value.trim();if(file){status($("#mediaStatus"),"Envoi du fichier vers Cloudinary…");const up=await uploadCloudinary(file,$("#uploadProgress"));url=up?.url||url;window.__lastCloudUpload=up}const data={categoryId:$("#mediaCategory").value,type:$("#mediaType").value,title:$("#mediaTitle").value.trim(),text:$("#mediaText").value.trim(),badge:$("#mediaBadge").value.trim(),price:$("#mediaPrice").value.trim(),duration:Number($("#mediaDuration").value||10),fit:$("#mediaFit").value,mediaUrl:url,startDate:$("#mediaStart").value||"",endDate:$("#mediaEnd").value||"",backgroundColor:$("#mediaBackground").value,textColor:$("#mediaTextColor").value,enabled:$("#mediaEnabled").checked,updatedAt:serverTimestamp(),cloudinaryDeleteToken:window.__lastCloudUpload?.deleteToken||"",cloudinaryPublicId:window.__lastCloudUpload?.publicId||"",cloudinaryResourceType:window.__lastCloudUpload?.resourceType||""};window.__lastCloudUpload=null;if(id)await setDoc(doc(db,"media",id),data,{merge:true});else await addDoc(collection(db,"media"),{...data,order:media.length+1,createdAt:serverTimestamp()});status($("#mediaStatus"),"Contenu enregistré.");resetMedia()}catch(err){status($("#mediaStatus"),"Échec de l’envoi ou de l’enregistrement.",false);console.error(err)}});
+$("#mediaForm").addEventListener("submit",async e=>{e.preventDefault();try{const id=$("#mediaId").value,file=$("#mediaFile").files[0];let url=$("#mediaUrl").value.trim(),upload=null;if(file){status($("#mediaStatus"),"Envoi du fichier vers Cloudinary…");const up=await uploadCloudinary(file,$("#uploadProgress"));url=up?.url||url;upload=up}const data={categoryId:$("#mediaCategory").value,type:$("#mediaType").value,title:$("#mediaTitle").value.trim(),text:$("#mediaText").value.trim(),badge:$("#mediaBadge").value.trim(),price:$("#mediaPrice").value.trim(),duration:Number($("#mediaDuration").value||10),fit:$("#mediaFit").value,mediaUrl:url,startDate:$("#mediaStart").value||"",endDate:$("#mediaEnd").value||"",backgroundColor:$("#mediaBackground").value,textColor:$("#mediaTextColor").value,enabled:$("#mediaEnabled").checked,updatedAt:serverTimestamp(),...(upload?{cloudinaryDeleteToken:upload.deleteToken,cloudinaryPublicId:upload.publicId,cloudinaryResourceType:upload.resourceType}:id&&media.find(m=>m.id===id)?.mediaUrl!==url?{cloudinaryDeleteToken:"",cloudinaryPublicId:"",cloudinaryResourceType:""}:{})};if(id)await setDoc(doc(db,"media",id),data,{merge:true});else await addDoc(collection(db,"media"),{...data,order:media.length+1,createdAt:serverTimestamp()});status($("#mediaStatus"),"Contenu enregistré.");resetMedia()}catch(err){status($("#mediaStatus"),"Échec de l’envoi ou de l’enregistrement.",false);console.error(err)}});
 $("#newMediaButton").addEventListener("click",resetMedia);
 function resetMedia(){$("#mediaForm").reset();$("#mediaId").value="";$("#mediaDuration").value=10;$("#mediaFit").value="contain";$("#mediaBackground").value="#5f0014";$("#mediaTextColor").value="#ffffff";$("#mediaEnabled").checked=true;fillCategorySelects()}
-function editMedia(id){const m=media.find(x=>x.id===id);if(!m)return;$("#mediaId").value=m.id;$("#mediaCategory").value=m.categoryId||"";$("#mediaType").value=m.type||"image";$("#mediaTitle").value=m.title||"";$("#mediaText").value=m.text||"";$("#mediaBadge").value=m.badge||"";$("#mediaPrice").value=m.price||"";$("#mediaDuration").value=m.duration||10;$("#mediaFit").value=m.fit||"contain";$("#mediaUrl").value=m.mediaUrl||"";$("#mediaStart").value=m.startDate||"";$("#mediaEnd").value=m.endDate||"";$("#mediaBackground").value=m.backgroundColor||"#5f0014";$("#mediaTextColor").value=m.textColor||"#ffffff";$("#mediaEnabled").checked=m.enabled!==false;window.scrollTo({top:0,behavior:"smooth"})}
+function editMedia(id){const m=media.find(x=>x.id===id);if(!m)return;$("#mediaFile").value="";$("#mediaId").value=m.id;$("#mediaCategory").value=m.categoryId||"";$("#mediaType").value=m.type||"image";$("#mediaTitle").value=m.title||"";$("#mediaText").value=m.text||"";$("#mediaBadge").value=m.badge||"";$("#mediaPrice").value=m.price||"";$("#mediaDuration").value=m.duration||10;$("#mediaFit").value=m.fit||"contain";$("#mediaUrl").value=m.mediaUrl||"";$("#mediaStart").value=m.startDate||"";$("#mediaEnd").value=m.endDate||"";$("#mediaBackground").value=m.backgroundColor||"#5f0014";$("#mediaTextColor").value=m.textColor||"#ffffff";$("#mediaEnabled").checked=m.enabled!==false;window.scrollTo({top:0,behavior:"smooth"})}
 async function removeMedia(id){const item=media.find(x=>x.id===id);if(!confirm("Supprimer définitivement ce contenu ?"))return;await deleteDoc(doc(db,"media",id));const erased=await deleteCloudinaryWithToken(item);if(erased)alert("Contenu et fichier Cloudinary supprimés.");else alert("Contenu supprimé définitivement de Banette Display. Le fichier Cloudinary ancien ne peut pas toujours être effacé automatiquement depuis GitHub Pages.");}
 $("#mediaFilter").addEventListener("change",renderMedia);
 
-$("#widgetForm").addEventListener("submit",async e=>{e.preventDefault();try{const id=$("#widgetId").value,data={type:$("#widgetType").value,title:$("#widgetTitle").value.trim(),text:$("#widgetText").value.trim(),icon:$("#widgetIcon").value.trim(),enabled:$("#widgetEnabled").checked,updatedAt:serverTimestamp(),cloudinaryDeleteToken:window.__lastCloudUpload?.deleteToken||"",cloudinaryPublicId:window.__lastCloudUpload?.publicId||"",cloudinaryResourceType:window.__lastCloudUpload?.resourceType||""};window.__lastCloudUpload=null;if(id)await setDoc(doc(db,"widgets",id),data,{merge:true});else await addDoc(collection(db,"widgets"),{...data,order:widgets.length+1,createdAt:serverTimestamp()});status($("#widgetStatus"),"Widget enregistré.");resetWidget()}catch(err){status($("#widgetStatus"),"Erreur d’enregistrement.",false);console.error(err)}});
+$("#widgetForm").addEventListener("submit",async e=>{e.preventDefault();try{const id=$("#widgetId").value,data={type:$("#widgetType").value,title:$("#widgetTitle").value.trim(),text:$("#widgetText").value.trim(),icon:$("#widgetIcon").value.trim(),enabled:$("#widgetEnabled").checked,updatedAt:serverTimestamp()};if(id)await setDoc(doc(db,"widgets",id),data,{merge:true});else await addDoc(collection(db,"widgets"),{...data,order:widgets.length+1,createdAt:serverTimestamp()});status($("#widgetStatus"),"Widget enregistré.");resetWidget()}catch(err){status($("#widgetStatus"),"Erreur d’enregistrement.",false);console.error(err)}});
 $("#newWidgetButton").addEventListener("click",resetWidget);
 function resetWidget(){$("#widgetForm").reset();$("#widgetId").value="";$("#widgetEnabled").checked=true}
 function editWidget(id){const w=widgets.find(x=>x.id===id);if(!w)return;$("#widgetId").value=w.id;$("#widgetType").value=w.type||"info";$("#widgetTitle").value=w.title||"";$("#widgetText").value=w.text||"";$("#widgetIcon").value=w.icon||"";$("#widgetEnabled").checked=w.enabled!==false;window.scrollTo({top:0,behavior:"smooth"})}
@@ -65,7 +70,7 @@ async function removeWidget(id){if(confirm("Supprimer ce widget ?"))await delete
 
 $("#urgentForm").addEventListener("submit",async e=>{e.preventDefault();try{let url=$("#urgentUrl").value.trim();const f=$("#urgentFile").files[0];if(f){status($("#urgentStatus"),"Envoi de l’image…");const up=await uploadCloudinary(f,null);url=up?.url||url}await setDoc(doc(db,"config","urgent"),{title:$("#urgentTitle").value.trim(),text:$("#urgentText").value.trim(),mediaUrl:url,backgroundColor:$("#urgentBackground").value,textColor:$("#urgentColor").value,enabled:$("#urgentEnabled").checked,updatedAt:serverTimestamp()});status($("#urgentStatus"),"Information enregistrée.")}catch(err){status($("#urgentStatus"),"Erreur pendant l’enregistrement.",false);console.error(err)}});
 
-$("#settingsForm").addEventListener("submit",async e=>{e.preventDefault();try{let logo=$("#logoUrl").value.trim();const f=$("#logoFile").files[0];if(f){status($("#settingsStatus"),"Envoi du logo…");const up=await uploadCloudinary(f,null);logo=up?.url||logo}await setDoc(doc(db,"config","settings"),{shopName:$("#shopName").value.trim(),shopSubtitle:$("#shopSubtitle").value.trim(),logoUrl:logo||"assets/logo-placeholder.svg",primaryColor:$("#primaryColor").value,secondaryColor:$("#secondaryColor").value,tickerText:$("#tickerText").value.trim(),tickerSpeed:Number($("#tickerSpeed").value||35),weatherCity:$("#weatherCity").value.trim(),weatherLat:Number($("#weatherLat").value),weatherLon:Number($("#weatherLon").value),defaultDuration:Number($("#defaultDuration").value||10),updatedAt:serverTimestamp()});status($("#settingsStatus"),"Réglages enregistrés.")}catch(err){status($("#settingsStatus"),"Erreur pendant l’enregistrement.",false);console.error(err)}});
+$("#settingsForm").addEventListener("submit",async e=>{e.preventDefault();try{let logo=$("#logoUrl").value.trim();const f=$("#logoFile").files[0];if(f){status($("#settingsStatus"),"Envoi du logo…");const up=await uploadCloudinary(f,null);logo=up?.url||logo}await setDoc(doc(db,"config","settings"),{shopName:$("#shopName").value.trim(),shopSubtitle:$("#shopSubtitle").value.trim(),logoUrl:logo||"assets/logo-placeholder.svg",primaryColor:$("#primaryColor").value,secondaryColor:$("#secondaryColor").value,tickerText:$("#tickerText").value.trim(),tickerSpeed:Number($("#tickerSpeed").value||35),defaultDuration:Number($("#defaultDuration").value||10),updatedAt:serverTimestamp()},{merge:true});status($("#settingsStatus"),"Réglages enregistrés.")}catch(err){status($("#settingsStatus"),"Erreur pendant l’enregistrement.",false);console.error(err)}});
 
 $("#passwordForm").addEventListener("submit",async e=>{e.preventDefault();const p=$("#newPassword").value,c=$("#confirmPassword").value;if(p!==c){status($("#passwordStatus"),"Les mots de passe sont différents.",false);return}try{await updatePassword(auth.currentUser,p);status($("#passwordStatus"),"Mot de passe modifié.");$("#passwordForm").reset()}catch(err){status($("#passwordStatus"),"Reconnectez-vous puis réessayez.",false);console.error(err)}});
 
@@ -75,5 +80,91 @@ function fillCategorySelects(){const opts=categories.map(c=>`<option value="${c.
 function renderCategories(){$("#metricCategories").textContent=categories.length;fillCategorySelects();const w=$("#categoryList");w.innerHTML="";if(!categories.length)w.innerHTML="<p>Aucun onglet.</p>";categories.forEach(c=>w.appendChild(row(c,`${c.duration||60} s`,()=>editCategory(c.id),()=>removeCategory(c.id),d=>move("categories",categories,c.id,d))))}
 function renderMedia(){$("#metricMedia").textContent=media.length;const f=$("#mediaFilter").value,list=f?media.filter(m=>m.categoryId===f):media,w=$("#mediaList");w.innerHTML="";if(!list.length)w.innerHTML="<p>Aucun contenu.</p>";list.forEach(m=>{const c=categories.find(x=>x.id===m.categoryId);w.appendChild(row(m,`${c?.name||"Sans onglet"} · ${m.type||"message"} · ${m.duration||10} s`,()=>editMedia(m.id),()=>removeMedia(m.id),d=>move("media",media,m.id,d)))})}
 function renderWidgets(){$("#metricWidgets").textContent=widgets.length;const w=$("#widgetList");w.innerHTML="";if(!widgets.length)w.innerHTML="<p>Aucun widget.</p>";widgets.forEach(x=>w.appendChild(row({...x,name:x.title||x.type},x.type||"info",()=>editWidget(x.id),()=>removeWidget(x.id),d=>move("widgets",widgets,x.id,d))))}
-async function loadConfig(){const s=await getDoc(doc(db,"config","settings"));if(s.exists()){const x=s.data();["shopName","shopSubtitle","logoUrl","tickerText","weatherCity"].forEach(k=>$("#"+k).value=x[k]||"");$("#primaryColor").value=x.primaryColor||"#5f0014";$("#secondaryColor").value=x.secondaryColor||"#f0c36b";$("#tickerSpeed").value=x.tickerSpeed||35;$("#weatherLat").value=x.weatherLat??48.4089;$("#weatherLon").value=x.weatherLon??-1.7517;$("#defaultDuration").value=x.defaultDuration||10}const u=await getDoc(doc(db,"config","urgent"));if(u.exists()){const x=u.data();$("#urgentTitle").value=x.title||"";$("#urgentText").value=x.text||"";$("#urgentUrl").value=x.mediaUrl||"";$("#urgentBackground").value=x.backgroundColor||"#5f0014";$("#urgentColor").value=x.textColor||"#fff";$("#urgentEnabled").checked=!!x.enabled}}
-function startListeners(){unsubs.push(onSnapshot(query(collection(db,"categories"),orderBy("order","asc")),s=>{categories=s.docs.map(d=>({id:d.id,...d.data()}));renderCategories();renderMedia()}));unsubs.push(onSnapshot(query(collection(db,"media"),orderBy("order","asc")),s=>{media=s.docs.map(d=>({id:d.id,...d.data()}));renderMedia()}));unsubs.push(onSnapshot(query(collection(db,"widgets"),orderBy("order","asc")),s=>{widgets=s.docs.map(d=>({id:d.id,...d.data()}));renderWidgets()}));loadConfig()}
+async function loadConfig(){const s=await getDoc(doc(db,"config","settings"));if(s.exists()){const x=s.data();["shopName","shopSubtitle","tickerText"].forEach(k=>$("#"+k).value=x[k]||"");$("#logoUrl").value=x.logoUrl&&x.logoUrl!=="assets/logo-placeholder.svg"?x.logoUrl:"";$("#primaryColor").value=x.primaryColor||"#5f0014";$("#secondaryColor").value=x.secondaryColor||"#f0c36b";$("#tickerSpeed").value=x.tickerSpeed||35;$("#defaultDuration").value=x.defaultDuration||10}const u=await getDoc(doc(db,"config","urgent"));if(u.exists()){const x=u.data();$("#urgentTitle").value=x.title||"";$("#urgentText").value=x.text||"";$("#urgentUrl").value=x.mediaUrl||"";$("#urgentBackground").value=x.backgroundColor||"#5f0014";$("#urgentColor").value=x.textColor||"#fff";$("#urgentEnabled").checked=!!x.enabled}}
+function startListeners(){unsubs.push(onSnapshot(doc(db,"config","weather"),s=>fillWeatherSettings(s.exists()?s.data():{}),()=>status($("#weatherSettingsStatus"),"Réglages météo indisponibles. Vérifiez votre connexion.",false)));unsubs.push(onSnapshot(doc(db,"config","tides"),s=>fillTideSettings(s.exists()?s.data():{}),()=>status($("#tideSettingsStatus"),"Réglages des marées indisponibles. Vérifiez la connexion.",false)));unsubs.push(onSnapshot(query(collection(db,"categories"),orderBy("order","asc")),s=>{categories=s.docs.map(d=>({id:d.id,...d.data()}));renderCategories();renderMedia()}));unsubs.push(onSnapshot(query(collection(db,"media"),orderBy("order","asc")),s=>{media=s.docs.map(d=>({id:d.id,...d.data()}));renderMedia()}));unsubs.push(onSnapshot(query(collection(db,"widgets"),orderBy("order","asc")),s=>{widgets=s.docs.map(d=>({id:d.id,...d.data()}));renderWidgets()}));loadConfig()}
+
+function openWidgets(){document.querySelector('.tab[data-tab="widgets"]').click()}
+$("#configureTides").addEventListener("click",openWidgets);
+$("#settingsWidgets").addEventListener("click",openWidgets);
+$("#settingsWeather").addEventListener("click",()=>document.querySelector('.tab[data-tab="weather"]').click());
+function updateTideLinks(){
+  const custom=$("#tideScreen").value==="custom";
+  $("#tideCustomLabel").classList.toggle("hidden",!custom);
+  $("#tideCustomScreen").required=custom;
+  const screen=custom?$("#tideCustomScreen").value.trim():$("#tideScreen").value;
+  const target=screen==="all"?"boutique":screen||"boutique";
+  $("#tidePreviewLink").href=`index.html?screen=${encodeURIComponent(target)}&view=tides`;
+  $("#tidePlayerLink").href=`index.html?screen=${encodeURIComponent(target)}`;
+}
+$("#tideScreen").addEventListener("change",updateTideLinks);
+$("#tideCustomScreen").addEventListener("input",updateTideLinks);
+function fillTideSettings(value){
+  tideSettings=tideConfig(value);
+  $("#tideEnabled").checked=tideSettings.enabled;
+  const known=["boutique","vitrine","laboratoire","all"].includes(tideSettings.screenId);
+  $("#tideScreen").value=known?tideSettings.screenId:"custom";
+  $("#tideCustomScreen").value=known?"":tideSettings.screenId;
+  $("#tideDisplayMode").value=tideSettings.displayMode;
+  $("#tideDuration").value=tideSettings.duration;
+  $("#tideConfigSummary").textContent=tideSettings.enabled?`Widget actif · ${tideSettings.screenId==="all"?"Tous les écrans":tideSettings.screenId}`:"Widget désactivé sur les écrans";
+  updateTideLinks();
+}
+$("#tideSettingsForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const button=e.submitter;
+  try{
+    if(button)button.disabled=true;
+    const screen=$("#tideScreen").value==="custom"?$("#tideCustomScreen").value.trim().toLowerCase():$("#tideScreen").value;
+    const config=tideConfig({enabled:$("#tideEnabled").checked,screenId:screen,displayMode:$("#tideDisplayMode").value,duration:$("#tideDuration").value});
+    await setDoc(doc(db,"config","tides"),{...config,updatedAt:serverTimestamp()},{merge:true});
+    fillTideSettings(config);
+    status($("#tideSettingsStatus"),"Réglages des marées enregistrés et synchronisés.");
+  }catch(error){status($("#tideSettingsStatus"),"Enregistrement impossible. Vérifiez votre connexion.",false);console.error(error)}
+  finally{if(button)button.disabled=false}
+});
+fillTideSettings({});
+
+function weatherFormConfig(){
+  return weatherConfig({enabled:$("#weatherEnabled").checked,screenId:$("#weatherScreen").value==="custom"?$("#weatherCustomScreen").value:$("#weatherScreen").value,city:$("#forecastCity").value,latitude:$("#forecastLatitude").value,longitude:$("#forecastLongitude").value,duration:$("#weatherDuration").value,interval:$("#weatherInterval").value,...Object.fromEntries(["Temperature","Condition","Rain","Wind","Sun"].map(k=>["show"+k,$("#weatherShow"+k).checked]))});
+}
+function weatherFormPreview(){
+  const custom=$("#forecastLocation").value==="custom";
+  $("#forecastCustomLocation").classList.toggle("hidden",!custom);
+  ["City","Latitude","Longitude"].forEach(k=>$("#forecast"+k).required=custom);
+  const screenCustom=$("#weatherScreen").value==="custom";
+  $("#weatherCustomScreenLabel").classList.toggle("hidden",!screenCustom);$("#weatherCustomScreen").required=screenCustom;
+  const duration=Number($("#weatherDuration").value),interval=Number($("#weatherInterval").value);
+  $("#weatherInterval").setCustomValidity(interval<duration+5?"Prévoyez au moins 5 secondes de diaporama entre deux passages météo.":"");
+  $("#weatherTimingHelp").textContent=interval>=duration+5?`${duration} secondes de météo, puis ${interval-duration} secondes de diaporama. Les messages prioritaires passent en premier.`:"Prévoyez au moins 5 secondes de diaporama entre deux passages météo.";
+  const config=weatherFormConfig();
+  $("#weatherPreviewLink").href=`index.html?screen=${encodeURIComponent(config.screenId==="all"?"boutique":config.screenId)}&view=weather`;
+  if($("#weatherSettingsForm").checkValidity())weatherService.configure(config);
+  renderWeather($("#adminWeatherPreview"),config);
+}
+function fillWeatherSettings(value){
+  const config=weatherConfig(value);
+  $("#weatherEnabled").checked=config.enabled;
+  const known=["boutique","vitrine","laboratoire","all"].includes(config.screenId);
+  $("#weatherScreen").value=known?config.screenId:"custom";$("#weatherCustomScreen").value=known?"":config.screenId;
+  $("#forecastCity").value=config.city;$("#forecastLatitude").value=config.latitude;$("#forecastLongitude").value=config.longitude;
+  $("#forecastLocation").value=config.city==="Combourg"&&config.latitude===48.4089&&config.longitude===-1.7517?"combourg":config.city==="Saint-Malo"&&config.latitude===48.6493&&config.longitude===-2.0257?"saint-malo":"custom";
+  $("#weatherDuration").value=config.duration;$("#weatherInterval").value=config.interval;
+  ["Temperature","Condition","Rain","Wind","Sun"].forEach(k=>$("#weatherShow"+k).checked=config["show"+k]);
+  weatherFormPreview();
+}
+$("#forecastLocation").addEventListener("change",()=>{
+  const value=$("#forecastLocation").value,known={combourg:["Combourg",48.4089,-1.7517],"saint-malo":["Saint-Malo",48.6493,-2.0257]}[value];
+  if(known)["City","Latitude","Longitude"].forEach((k,i)=>$("#forecast"+k).value=known[i]);
+  weatherFormPreview();
+});
+$("#weatherSettingsForm").addEventListener("change",weatherFormPreview);
+$("#weatherDuration").addEventListener("input",weatherFormPreview);
+$("#weatherInterval").addEventListener("input",weatherFormPreview);
+$("#weatherSettingsForm").addEventListener("submit",async e=>{
+  e.preventDefault();const config=weatherFormConfig(),button=e.submitter;
+  if(!["Temperature","Condition","Rain","Wind","Sun"].some(k=>config["show"+k])){status($("#weatherSettingsStatus"),"Choisissez au moins une information à afficher.",false);return;}
+  try{if(button)button.disabled=true;await setDoc(doc(db,"config","weather"),{...config,updatedAt:serverTimestamp()},{merge:true});status($("#weatherSettingsStatus"),"Météo enregistrée et synchronisée sur les écrans.");}
+  catch(error){status($("#weatherSettingsStatus"),"Enregistrement impossible. Vérifiez votre connexion.",false);console.error(error);}
+  finally{if(button)button.disabled=false;}
+});
+fillWeatherSettings({});

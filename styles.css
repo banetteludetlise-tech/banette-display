@@ -131,3 +131,60 @@ button,input,select,textarea{font:inherit}.btn{border:0;border-radius:12px;paddi
 .offline{position:absolute;right:16px;bottom:58px;z-index:25;background:#111d;padding:8px 12px;border-radius:9px}
 .admin-header{background:linear-gradient(90deg,var(--primary-dark),var(--primary));color:#fff;padding:20px clamp(16px,4vw,56px);display:flex;justify-content:space-between;align-items:center;gap:18px}.admin-header h1{margin:0}.admin-header p{margin:4px 0 0;opacity:.8}.header-actions{display:flex;gap:9px;flex-wrap:wrap}.admin-main{max-width:1200px;margin:auto;padding:25px 16px 60px}.card{background:var(--paper);border:1px solid var(--line);border-radius:17px;padding:22px;margin-bottom:20px}.card h2{margin-top:0}.card p{color:var(--muted)}.login-card{max-width:520px;margin:40px auto}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.tab{border:0;border-radius:999px;padding:10px 15px;background:#eae4e6;color:var(--primary-dark);font-weight:900;cursor:pointer}.tab.active{background:var(--primary);color:#fff}.tab-panel{display:none}.tab-panel.active{display:block}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}.metric-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:18px}.metric-card span{display:block;color:var(--muted)}.metric-card strong{font-size:2rem;color:var(--primary)}.form-grid{display:grid;gap:15px}.form-grid.two-cols{grid-template-columns:repeat(2,minmax(0,1fr))}.form-grid .full{grid-column:1/-1}label{display:grid;gap:6px;font-weight:800}input,select,textarea{width:100%;border:1px solid #cfc4c7;border-radius:10px;padding:11px 12px;background:#fff}input:focus,select:focus,textarea:focus{outline:3px solid #ecd2d9;border-color:var(--primary)}input[type=color]{height:46px;padding:4px}.check-row{display:flex;align-items:center;gap:8px}.check-row input{width:auto}.date-wrap{display:flex;width:100%;min-width:0;border:1px solid #cfc4c7;border-radius:10px;padding:11px 12px}.date-wrap input{border:0;padding:0;min-width:0}.form-actions{display:flex;gap:9px;flex-wrap:wrap}.status{min-height:20px;font-weight:800}.status.ok{color:#087a39}.status.error{color:#b91c1c}.item-list{display:grid;gap:11px}.item-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:13px;padding:13px}.item-row h3{margin:0 0 4px}.item-row p{margin:0;color:var(--muted)}.item-actions{display:flex;gap:7px;flex-wrap:wrap}.state{display:inline-block;padding:3px 7px;border-radius:999px;font-size:.78rem;font-weight:900}.state.on{background:#dcfce7;color:#166534}.state.off{background:#fee2e2;color:#991b1b}.filter{max-width:320px;margin-bottom:14px}progress{width:100%;height:14px}small{color:var(--muted);font-weight:500}
 @media(max-width:900px){.widgets-bar{display:none}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:720px){.admin-header{align-items:flex-start;flex-direction:column}.form-grid.two-cols{grid-template-columns:1fr}.item-row{grid-template-columns:1fr}.brand-area{min-width:0}}
+
+/* Pages locales : mêmes couleurs Banette, typographie lisible depuis la boutique. */
+.version-label{font-size:.55em;color:var(--secondary);white-space:nowrap}
+fieldset{min-width:0;margin:0;border:1px solid var(--line);border-radius:12px;padding:18px}
+legend{padding:0 7px;font-weight:800}.weather-field-options{display:flex;gap:14px 26px;flex-wrap:wrap}
+.weather-panel{--weather-ink:#fff8ed;position:relative;color:var(--weather-ink);background:radial-gradient(ellipse at 95% 0%,#a24d4555,transparent 60%),linear-gradient(135deg,var(--primary-dark),var(--primary));padding:4vh 4vw;display:flex;flex-direction:column;gap:2.5vh}
+.weather-slide{position:absolute;inset:0;z-index:30}
+.weather-heading{display:flex;justify-content:space-between;align-items:center;gap:24px}
+.weather-heading h2{font-size:clamp(30px,3.7vw,76px);line-height:1.1;margin:8px 0 0;letter-spacing:-.04em}
+.weather-panel .weather-eyebrow{font-size:clamp(10px,1vw,21px);font-weight:800;letter-spacing:.18em;color:var(--secondary);margin:0}
+.weather-panel .weather-today{color:#fff8edbd;text-align:right;font-size:clamp(12px,1.3vw,25px);margin:0;text-transform:capitalize}
+.weather-days{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.8vw;flex:1;min-height:0}
+.weather-day{background:#ffffff0d;border:1px solid #ffffff30;border-radius:22px;padding:2.7vh 2vw;display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.weather-day-today{background:#fff4dd;color:#3b1821;border-color:transparent;box-shadow:0 10px 32px #15000533}
+.weather-day h3{font-size:clamp(20px,2.1vw,42px);margin:0;letter-spacing:-.02em}
+.weather-panel .weather-day-date{font-size:clamp(11px,1.15vw,23px);margin:6px 0 0;color:inherit;opacity:.72}
+.weather-icon{height:clamp(55px,12vh,140px);width:clamp(55px,12vh,140px);margin:1vh 0 0}
+.weather-icon svg{width:100%;height:100%;filter:drop-shadow(0 3px 4px #220a2220)}
+.weather-day-today .weather-icon{filter:drop-shadow(0 0 1px #604445)}
+.weather-panel .weather-condition{font-size:clamp(17px,1.75vw,35px);font-weight:700;color:inherit;margin:0 0 1vh}
+.weather-temperature{display:flex;align-items:baseline;gap:1vw;margin-bottom:1.5vh}
+.weather-temperature strong{font-size:clamp(42px,5.8vw,116px);letter-spacing:-.07em;line-height:1.1;font-weight:800}
+.weather-temperature span{font-size:clamp(14px,1.5vw,30px);opacity:.7}
+.weather-details{border-top:1px solid currentColor;padding-top:1vh;margin-top:auto;width:100%}
+.weather-panel .weather-details p{color:inherit;font-size:clamp(12px,1.2vw,24px);line-height:1.35;margin:.6vh 0}
+.weather-panel .weather-partial{color:inherit;opacity:.65;font-size:clamp(10px,.9vw,18px);margin:1vh 0 0}
+.weather-panel .weather-unavailable{color:inherit;margin:auto 0;font-size:clamp(16px,1.7vw,34px)}
+.weather-footer{display:flex;justify-content:space-between;gap:12px;font-size:clamp(9px,.83vw,17px)}
+.weather-panel .weather-footer p{color:#fff8edb8;margin:0}.weather-footer a{color:inherit}
+.weather-admin-preview{border-radius:16px;min-height:460px;padding:28px;gap:22px}
+.weather-admin-preview .weather-heading h2{font-size:32px}.weather-admin-preview .weather-eyebrow{font-size:10px}
+.weather-admin-preview .weather-days{gap:15px}.weather-admin-preview .weather-day{padding:22px 18px}
+.weather-admin-preview .weather-day h3{font-size:23px}.weather-admin-preview .weather-icon{width:75px;height:75px}
+.weather-admin-preview .weather-temperature strong{font-size:62px}.weather-admin-preview .weather-details p{font-size:14px}
+.weather-admin-preview .weather-temperature span,.weather-admin-preview .weather-condition{font-size:18px}
+.tide-panel{background:#f8f3e9;color:#35232a;padding:30px;border-radius:16px}
+.tide-slide{position:absolute;inset:138px 0 45px;z-index:4;padding:2vh 6vw;background:#f8f3e9;color:#35232a;overflow:auto}
+.tide-heading h2{font-size:clamp(26px,2.8vw,56px);letter-spacing:-.03em;margin:5px 0}
+.tide-eyebrow{font-size:clamp(10px,.8vw,16px);letter-spacing:.16em;font-weight:800;color:var(--primary)}
+.tide-date{margin:0;color:var(--muted);font-size:clamp(12px,1vw,20px)}
+.tide-trend{display:inline-block;background:var(--primary);color:#fff;padding:7px 16px;border-radius:99px;font-weight:800;margin:12px 0}
+.tide-next{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:16px}
+.tide-next-card{display:flex;flex-direction:column;gap:5px;background:#fff;padding:15px 22px;border:1px solid #e6dac7;border-radius:14px}
+.tide-next-card strong{font-size:clamp(25px,2.8vw,56px);line-height:1.15;color:var(--primary)}
+.tide-next-card span{font-size:clamp(12px,1vw,20px)}
+.tide-table{border-collapse:collapse;width:100%;font-size:clamp(12px,1.15vw,23px);font-variant-numeric:tabular-nums}
+.tide-table caption{text-align:left;font-weight:800;margin-bottom:8px}.tide-table th{text-align:left;color:var(--muted);font-size:.8em}
+.tide-table td,.tide-table th{padding:.65vh 10px;border-bottom:1px solid #ded5c7}.tide-past{color:#80747a}
+.tide-source,.tide-disclaimer,.tide-cache-note{margin:8px 0 0;font-size:clamp(10px,.8vw,16px);color:var(--muted)}
+.tide-source a{color:var(--primary)}.tide-cache-note{font-weight:700}.tide-unavailable{padding:25px 0}
+.tide-meta{font-size:.65rem;opacity:.8}.tide-header{min-width:180px}.tide-header .widget-value{font-size:clamp(.85rem,1vw,1.1rem)}
+@media(max-height:650px) and (min-width:721px){.weather-panel{gap:2vh;padding:3vh 4vw}.weather-day{padding:2vh 2vw}.weather-icon{height:9vh;width:9vh}.weather-temperature strong{font-size:8vh}.weather-details p{font-size:2.3vh}.tide-slide{padding:10px 5vw}.tide-heading h2{font-size:24px}.tide-next{margin-bottom:8px}.tide-next-card{padding:8px 15px}.tide-next-card strong{font-size:28px}.tide-trend{margin:6px 0}.tide-table{font-size:13px}}
+@media(max-width:720px){.weather-panel{padding:25px 20px;gap:20px}.weather-heading{align-items:flex-start;flex-direction:column;gap:10px}.weather-heading h2{font-size:30px}.weather-today{text-align:left}.weather-days{grid-template-columns:1fr;gap:12px}.weather-day{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:15px;border-radius:14px}.weather-day h3{font-size:20px}.weather-day-date{grid-column:1}.weather-icon{grid-column:2;grid-row:1/4;width:52px;height:52px;margin:0}.weather-condition{grid-column:1}.weather-temperature{grid-column:2;grid-row:4/6;flex-direction:column;gap:0;margin:0;align-items:flex-end}.weather-temperature strong{font-size:38px}.weather-temperature span{font-size:12px}.weather-details{grid-column:1;margin-top:8px;padding-top:5px}.weather-details p{font-size:12px}.weather-partial{grid-column:1/-1}.weather-slide{overflow-y:auto}.weather-footer{flex-direction:column;gap:5px;font-size:10px}.weather-admin-preview .weather-days{gap:12px}.weather-admin-preview .weather-day{padding:15px}.weather-admin-preview .weather-icon{width:52px;height:52px}.weather-admin-preview .weather-temperature strong{font-size:38px}.tide-next{gap:10px}.tide-next-card{padding:12px}.tide-table td,.tide-table th{padding:6px}.tide-panel{padding:18px}}
+@media(max-height:800px) and (min-width:721px){.tide-slide{padding:10px 5vw}.tide-heading h2{font-size:28px}.tide-next{margin-bottom:10px}.tide-next-card{padding:10px 18px}.tide-next-card strong{font-size:32px}.tide-trend{margin:7px 0}.tide-table{font-size:14px}.tide-table td,.tide-table th{padding:4px 10px}.tide-source,.tide-disclaimer,.tide-cache-note{margin-top:6px;font-size:10px}}
+/* Les widgets restent sur une ligne pour ne pas empiéter sur les catégories. */
+.widgets-bar{flex-wrap:nowrap;min-width:0}.widget{min-width:0;flex:0 1 auto}.widget-value{white-space:nowrap}.tide-header{min-width:0}.brand-area{min-width:0;flex-shrink:0}
+@media(min-width:901px) and (max-width:1100px){.widgets-bar{gap:3px}.widget{padding:7px 6px}.widget-value,.tide-header .widget-value{font-size:.8rem}.brand-name{font-size:1.15rem}}

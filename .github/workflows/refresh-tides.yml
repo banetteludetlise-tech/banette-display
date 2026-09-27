@@ -1,0 +1,45 @@
+name: Actualiser les marées de Saint-Malo
+on:
+  schedule:
+    - cron: '17 3,9,15,21 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/refresh-tides.mjs
+      - scripts/shom-parser.mjs
+      - tide-model.js
+      - .github/workflows/refresh-tides.yml
+permissions:
+  contents: write
+concurrency:
+  group: saint-malo-tides
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Vérifier le traitement des données
+        run: node --test tests/*.test.js
+      - name: Lire les prévisions publiques SHOM
+        run: node scripts/refresh-tides.mjs /tmp/tides.json
+      - name: Publier les données sans modifier le lecteur
+        shell: bash
+        run: |
+          if git ls-remote --exit-code --heads origin tides-data; then
+            git fetch origin tides-data
+            git checkout -B tides-data origin/tides-data
+          else
+            git checkout -b tides-data
+          fi
+          cp /tmp/tides.json tides.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tides.json
+          git diff --cached --quiet || git commit -m 'Actualiser les prévisions SHOM Saint-Malo'
+          git push origin tides-data

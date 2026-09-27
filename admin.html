@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#5f0014">
-  <title>Administration — Banette Display</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Administration — Banette Display V4.5</title>
+  <link rel="stylesheet" href="styles.css?v=4.5.0">
 </head>
 <body class="admin-page">
   <header class="admin-header">
     <div>
-      <h1>Banette Display Entreprise</h1>
-      <p>Gestion à distance — Cloudinary + Firebase</p>
+      <h1>Banette Display Entreprise <span class="version-label">V4.5</span></h1>
+      <p>Vos contenus et vos écrans, au même endroit</p>
     </div>
     <div class="header-actions">
       <a href="index.html" target="_blank" rel="noopener" class="btn secondary">Voir l’écran</a>
@@ -40,6 +40,7 @@
         <button class="tab" data-tab="categories" type="button">Onglets</button>
         <button class="tab" data-tab="media" type="button">Photos & vidéos</button>
         <button class="tab" data-tab="widgets" type="button">Widgets</button>
+        <button class="tab" data-tab="weather" type="button">Météo 3 jours</button>
         <button class="tab" data-tab="urgent" type="button">Information principale</button>
         <button class="tab" data-tab="settings" type="button">Réglages</button>
         <button class="tab" data-tab="security" type="button">Sécurité</button>
@@ -55,6 +56,11 @@
         <div class="card">
           <h2>Stockage gratuit activé</h2>
           <p>Les photos, vidéos et logos sont envoyés dans Cloudinary. Les onglets, réglages et programmations sont enregistrés dans Firestore.</p>
+        </div>
+        <div class="card tide-dashboard">
+          <article id="dashboardTides" class="tide-panel" aria-label="Marées de Saint-Malo"></article>
+          <p id="tideConfigSummary"></p>
+          <button id="configureTides" class="btn secondary" type="button">Paramétrer le widget Marées</button>
         </div>
       </section>
 
@@ -165,6 +171,42 @@
 
       <section id="tab-widgets" class="tab-panel">
         <div class="card">
+          <h2>Marées de Saint-Malo</h2>
+          <p>Horaires, hauteurs et coefficients SHOM. Actualisation automatique ; heure de Paris.</p>
+          <form id="tideSettingsForm" class="form-grid two-cols">
+            <label class="check-row full"><input id="tideEnabled" type="checkbox" checked> Activer le widget Marées</label>
+            <label>Écran concerné
+              <select id="tideScreen">
+                <option value="boutique">Boutique</option>
+                <option value="vitrine">Vitrine</option>
+                <option value="laboratoire">Laboratoire</option>
+                <option value="all">Tous les écrans</option>
+                <option value="custom">Autre écran</option>
+              </select>
+            </label>
+            <label id="tideCustomLabel" class="hidden">Identifiant de l’écran
+              <input id="tideCustomScreen" type="text" maxlength="50" pattern="[a-z0-9_-]+" placeholder="terrasse">
+            </label>
+            <label>Affichage sur le lecteur
+              <select id="tideDisplayMode">
+                <option value="both">Bandeau et page dans le diaporama</option>
+                <option value="compact">Bandeau uniquement</option>
+                <option value="fullscreen">Page dans le diaporama uniquement</option>
+              </select>
+            </label>
+            <label>Durée de la page Marées (secondes)
+              <input id="tideDuration" type="number" min="10" max="120" value="20" required>
+            </label>
+            <p class="full" id="tideScreenHelp">Le lecteur utilise l’écran Boutique si aucune sélection n’est précisée dans son adresse.</p>
+            <div class="form-actions full">
+              <button class="btn primary" type="submit">Enregistrer les marées</button>
+              <a id="tidePreviewLink" href="index.html?screen=boutique&view=tides" target="_blank" rel="noopener" class="btn secondary">Aperçu des marées</a>
+              <a id="tidePlayerLink" href="index.html?screen=boutique" target="_blank" rel="noopener" class="btn secondary">Ouvrir cet écran</a>
+            </div>
+            <div id="tideSettingsStatus" class="status full" aria-live="polite"></div>
+          </form>
+        </div>
+        <div class="card">
           <h2>Ajouter un widget</h2>
           <form id="widgetForm" class="form-grid two-cols">
             <input id="widgetId" type="hidden">
@@ -201,6 +243,42 @@
         </div>
       </section>
 
+      <section id="tab-weather" class="tab-panel">
+        <div class="card">
+          <h2>Météo plein écran · Prévisions sur 3 jours</h2>
+          <p>Aujourd’hui, demain et après-demain. Choisissez le rythme et les informations ; le diaporama reprend après la météo.</p>
+          <form id="weatherSettingsForm" class="form-grid two-cols">
+            <label class="check-row full"><input id="weatherEnabled" type="checkbox" checked> Activer la page météo dans le diaporama</label>
+            <label>Ville <select id="forecastLocation"><option value="combourg">Combourg</option><option value="saint-malo">Saint-Malo</option><option value="custom">Autre ville</option></select></label>
+            <label>Écran <select id="weatherScreen"><option value="boutique">Boutique</option><option value="vitrine">Vitrine</option><option value="laboratoire">Laboratoire</option><option value="all">Tous les écrans</option><option value="custom">Autre écran</option></select></label>
+            <label id="weatherCustomScreenLabel" class="hidden">Identifiant de l’écran <input id="weatherCustomScreen" type="text" pattern="[a-z0-9_-]+" maxlength="50" placeholder="terrasse"></label>
+            <fieldset id="forecastCustomLocation" class="full hidden form-grid two-cols">
+              <legend>Localisation météo</legend>
+              <label class="full">Nom de la ville <input id="forecastCity" type="text" maxlength="60" value="Combourg"></label>
+              <label>Latitude <input id="forecastLatitude" type="number" min="-90" max="90" step="0.0001" value="48.4089"></label>
+              <label>Longitude <input id="forecastLongitude" type="number" min="-180" max="180" step="0.0001" value="-1.7517"></label>
+            </fieldset>
+            <label>Durée d’affichage de la météo (secondes) <input id="weatherDuration" type="number" min="5" max="120" value="20" required></label>
+            <label>Un passage toutes les… (secondes) <input id="weatherInterval" type="number" min="10" max="3600" value="60" required></label>
+            <p id="weatherTimingHelp" class="full">20 secondes de météo, puis 40 secondes de diaporama. Les messages prioritaires passent en premier.</p>
+            <fieldset class="full weather-field-options">
+              <legend>Informations affichées</legend>
+              <label class="check-row"><input id="weatherShowCondition" type="checkbox" checked> Icône et état du ciel</label>
+              <label class="check-row"><input id="weatherShowTemperature" type="checkbox" checked> Températures mini / maxi</label>
+              <label class="check-row"><input id="weatherShowRain" type="checkbox" checked> Pluie prévue (mm), risque si fourni</label>
+              <label class="check-row"><input id="weatherShowWind" type="checkbox" checked> Vent maximal (km/h)</label>
+              <label class="check-row"><input id="weatherShowSun" type="checkbox"> Lever / coucher du soleil</label>
+            </fieldset>
+            <div class="form-actions full">
+              <button class="btn primary" type="submit">Enregistrer la météo</button>
+              <a id="weatherPreviewLink" href="index.html?screen=boutique&amp;view=weather" target="_blank" rel="noopener" class="btn secondary">Ouvrir la météo plein écran enregistrée</a>
+            </div>
+            <div id="weatherSettingsStatus" class="status full" aria-live="polite"></div>
+          </form>
+        </div>
+        <div class="card"><h2>Aperçu de vos réglages</h2><p>Cet aperçu suit les réglages du formulaire. Enregistrez pour les appliquer aux écrans.</p><article id="adminWeatherPreview" class="weather-panel weather-admin-preview"></article></div>
+      </section>
+
       <section id="tab-urgent" class="tab-panel">
         <div class="card">
           <h2>Information principale prioritaire</h2>
@@ -231,6 +309,7 @@
       </section>
 
       <section id="tab-settings" class="tab-panel">
+        <div class="card"><h2>Informations des écrans</h2><p>Réglez la météo, les marées et les informations affichées sur vos écrans.</p><div class="form-actions"><button id="settingsWidgets" type="button" class="btn secondary">Paramètres des widgets</button><button id="settingsWeather" type="button" class="btn secondary">Paramètres de la météo</button></div></div>
         <div class="card">
           <h2>Apparence générale</h2>
           <form id="settingsForm" class="form-grid two-cols">
@@ -258,15 +337,6 @@
             <label>Vitesse du bandeau
               <input id="tickerSpeed" type="number" min="10" max="180" value="35">
             </label>
-            <label>Ville météo
-              <input id="weatherCity" type="text" value="Combourg">
-            </label>
-            <label>Latitude
-              <input id="weatherLat" type="number" step="0.0001" value="48.4089">
-            </label>
-            <label>Longitude
-              <input id="weatherLon" type="number" step="0.0001" value="-1.7517">
-            </label>
             <label>Durée par défaut
               <input id="defaultDuration" type="number" min="3" max="600" value="10">
             </label>
@@ -293,6 +363,6 @@
       </section>
     </section>
   </main>
-  <script type="module" src="admin.js"></script>
+  <script type="module" src="admin.js?v=4.5.0"></script>
 </body>
 </html>
