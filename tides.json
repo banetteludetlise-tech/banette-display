@@ -1,0 +1,195 @@
+{
+  "port": "SAINT-MALO",
+  "fetchedAt": "2026-09-27T15:14:00.784Z",
+  "events": [
+    {
+      "date": "2026-09-27",
+      "time": "02:56",
+      "type": "low",
+      "height": 1.58,
+      "coefficient": null
+    },
+    {
+      "date": "2026-09-27",
+      "time": "08:20",
+      "type": "high",
+      "height": 12.15,
+      "coefficient": 95
+    },
+    {
+      "date": "2026-09-27",
+      "time": "15:14",
+      "type": "low",
+      "height": 1.62,
+      "coefficient": null
+    },
+    {
+      "date": "2026-09-27",
+      "time": "20:37",
+      "type": "high",
+      "height": 12.5,
+      "coefficient": 97
+    },
+    {
+      "date": "2026-09-28",
+      "time": "03:34",
+      "type": "low",
+      "height": 1.35,
+      "coefficient": null
+    },
+    {
+      "date": "2026-09-28",
+      "time": "08:54",
+      "type": "high",
+      "height": 12.4,
+      "coefficient": 99
+    },
+    {
+      "date": "2026-09-28",
+      "time": "15:51",
+      "type": "low",
+      "height": 1.46,
+      "coefficient": null
+    },
+    {
+      "date": "2026-09-28",
+      "time": "21:12",
+      "type": "high",
+      "height": 12.6,
+      "coefficient": 99
+    },
+    {
+      "date": "2026-09-29",
+      "time": "04:10",
+      "type": "low",
+      "height": 1.34,
+      "coefficient": null
+    },
+    {
+      "date": "2026-09-29",
+      "time": "09:28",
+      "type": "high",
+      "height": 12.45,
+      "coefficient": 98
+    },
+    {
+      "date": "2026-09-29",
+      "time": "16:26",
+      "type": "low",
+      "height": 1.53,
+      "coefficient": null
+    },
+    {
+      "date": "2026-09-29",
+      "time": "21:46",
+      "type": "high",
+      "height": 12.46,
+      "coefficient": 96
+    },
+    {
+      "date": "2026-09-30",
+      "time": "04:44",
+      "type": "low",
+      "height": 1.6,
+      "coefficient": null
+    },
+    {
+      "date": "2026-09-30",
+      "time": "10:01",
+      "type": "high",
+      "height": 12.23,
+      "coefficient": 92
+    },
+    {
+      "date": "2026-09-30",
+      "time": "16:59",
+      "type": "low",
+      "height": 1.86,
+      "coefficient": null
+    },
+    {
+      "date": "2026-09-30",
+      "time": "22:21",
+      "type": "high",
+      "height": 12.02,
+      "coefficient": 88
+    },
+    {
+      "date": "2026-10-01",
+      "time": "05:16",
+      "type": "low",
+      "height": 2.11,
+      "coefficient": null
+    },
+    {
+      "date": "2026-10-01",
+      "time": "10:36",
+      "type": "high",
+      "height": 11.75,
+      "coefficient": 82
+    },
+    {
+      "date": "2026-10-01",
+      "time": "17:33",
+      "type": "low",
+      "height": 2.44,
+      "coefficient": null
+    },
+    {
+      "date": "2026-10-01",
+      "time": "22:57",
+      "type": "high",
+      "height": 11.29,
+      "coefficient": 75
+    },
+    {
+      "date": "2026-10-02",
+      "time": "05:50",
+      "type": "low",
+      "height": 2.84,
+      "coefficient": null
+    },
+    {
+      "date": "2026-10-02",
+      "time": "11:13",
+      "type": "high",
+      "height": 11.01,
+      "coefficient": 68
+    },
+    {
+      "date": "2026-10-02",
+      "time": "18:10",
+      "type": "low",
+      "height": 3.19,
+      "coefficient": null
+    },
+    {
+      "date": "2026-10-02",
+      "time": "23:40",
+      "type": "high",
+      "height": 10.35,
+      "coefficient": 60
+    },
+    {
+      "date": "2026-10-03",
+      "time": "06:30",
+      "type": "low",
+      "height": 3.7,
+      "coefficient": null
+    },
+    {
+      "date": "2026-10-03",
+      "time": "12:00",
+      "type": "high",
+      "height": 10.11,
+      "coefficient": 53
+    },
+    {
+      "date": "2026-10-03",
+      "time": "19:00",
+      "type": "low",
+      "height": 4,
+      "coefficient": null
+    }
+  ]
+}
