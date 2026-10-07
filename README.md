@@ -1,6 +1,16 @@
-# Banette Display V4.5 Entreprise
+# Banette Display V4.5.1 Entreprise
 
 Version actuelle : GitHub Pages + Firebase + Cloudinary, issue de la V4.3/V4.4 existante. Voir les nouveautés et réglages V4.5 plus bas.
+
+## V4.5.1 — essai anti-veille facultatif
+
+Lien Boutique : `index.html?screen=boutique&keepawake=test`. Cliquer sur **Démarrer l’essai**, puis laisser le téléviseur fonctionner sans toucher la télécommande pendant au moins 30 minutes et au-delà du délai habituel de coupure. Le compteur signale seulement le déroulement de l’essai : il ne confirme pas que la veille du système est désactivée. **Quitter l’essai** revient à l’adresse habituelle. Aucun réglage n’est enregistré sur le Stick ou dans Firebase ; le mode est désactivé sur les liens sans `keepawake=test`.
+
+Le mode essaie Screen Wake Lock et une vidéo silencieuse pendant les images, messages et pages météo/marées. La vidéo d’essai est libérée avant de charger une vidéo du diaporama, puis reprend lorsque le lecteur revient aux images. Pendant une page météo superposée à une vidéo en pause, aucun second décodeur n’est ouvert. Les délais météo longs et les vidéos terminées longtemps avant le changement de diapositive peuvent donc laisser un intervalle sans lecture. Le mode s’arrête lorsque l’onglet est masqué et signale un blocage de lecture.
+
+**Limite Fire TV Stick 4K Select / Vega OS :** Amazon ne fournit pas de commande publique pour désactiver la veille ; le système peut ignorer les demandes du navigateur. Ce mode expérimental n’est pas une solution validée sur ce matériel. Seul un essai sur le téléviseur peut établir s’il aide avec la version de Silk installée. Sources : [limitation Vega OS](https://community.amazondeveloper.com/t/prevent-the-fire-stick-from-going-into-sleep-mode-or-turning-off/29246), [comportement à la coupure HDMI](https://community.amazondeveloper.com/t/vega-ambient-mode-idle-behavior/28788).
+
+La vidéo de 3,8 Ko provient de [NoSleep.js v0.12.0](https://github.com/richtr/NoSleep.js/blob/v0.12.0/src/media.js), sous licence MIT incluse dans `assets/keep-awake.LICENSE.txt`. Aucun script tiers de cette bibliothèque n’est exécuté.
 
 ## Historique V4.3 — installation manuelle
 

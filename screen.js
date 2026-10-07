@@ -3,6 +3,7 @@ import {tideConfig,tidesOnScreen} from "./tide-model.js";
 import {weatherService,renderWeather} from "./weather.js";
 import {weatherConfig,weatherOnScreen,WeatherSchedule} from "./weather-model.js";
 import {PlaybackClock} from "./playback-clock.js";
+import {mountKeepAwakeTrial} from "./keep-awake.js";
 import { firebaseConfig } from "./firebase-config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getFirestore, collection, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
@@ -10,6 +11,7 @@ const app=initializeApp(firebaseConfig),db=getFirestore(app),$=s=>document.query
 const D={shopName:"Votre Artisan Boulanger",shopSubtitle:"Banette Combourg",logoUrl:"assets/logo-placeholder.svg",primaryColor:"#5f0014",secondaryColor:"#f0c36b",tickerText:"Bienvenue dans votre boulangerie artisanale.",tickerSpeed:35,weatherCity:"Combourg",weatherLat:48.4089,weatherLon:-1.7517,defaultDuration:10};
 let settings=cache("settings",D),categories=cache("categories",[]),media=cache("media",[]),widgets=cache("widgets",[]),urgent=cache("urgent",{enabled:false}),ci=0,mi=0;
 const clock=new PlaybackClock(),params=new URLSearchParams(location.search),screenId=(params.get("screen")||"boutique").toLowerCase(),view=params.get("view");
+const keepAwake=params.get("keepawake")==="test"?mountKeepAwakeTrial():null;
 let tideSettings=tideConfig(cache("tides",{})),weatherSettings=weatherConfig(cache("weather_settings",{})),weatherShowing=false,weatherEndTimer,widgetGeneration=0;
 const weatherSchedule=new WeatherSchedule();
 weatherSchedule.configure(weatherSettings,screenId);
@@ -27,8 +29,8 @@ function active(m){if(m.enabled===false)return false;const n=Date.now(),s=m.star
 function listFor(id){return media.filter(m=>m.categoryId===id&&active(m)).sort((a,b)=>(a.order??999)-(b.order??999))}
 function renderCats(){const bar=$("#categoryBar"),list=cats();bar.innerHTML="";list.forEach((c,i)=>{const b=document.createElement("button");b.className="category-chip"+(i===ci?" active":"");b.textContent=`${c.icon||""} ${c.name||"Onglet"}`.trim();b.addEventListener("click",()=>{ci=i;mi=0;startCategory()});bar.appendChild(b)})}
 function startCategory(){clock.clear("slide");clock.clear("category");const list=cats();if(!list.length){next();return}if(ci>=list.length)ci=0;renderCats();const c=list[ci];mi=0;next();clock.schedule("category",()=>{ci=(ci+1)%list.length;startCategory()},Math.max(10,Number(c.duration||60))*1000)}
-function hide(){$("#tideSlide").classList.add("hidden");$("#imageMedia").classList.add("hidden");const v=$("#videoMedia");v.classList.add("hidden");v.pause();v.removeAttribute("src")}
-function show(x){clock.clear("slide");hide();$("#slideBackground").style.backgroundColor=x.backgroundColor||settings.primaryColor||D.primaryColor;$("#slideBackground").style.backgroundImage=(x.type==="message"&&x.mediaUrl)?`url("${x.mediaUrl}")`:"none";$("#slideCard").style.color=x.textColor||"#fff";const hideTitleForMedia=(x.type==="image"||x.type==="video");$("#title").textContent=hideTitleForMedia?"":(x.title||"");$("#text").textContent=x.text||"";$("#badge").textContent=x.badge||"";$("#badge").classList.toggle("hidden",!x.badge);$("#price").textContent=x.price||"";$("#price").classList.toggle("hidden",!x.price);$("#slideCard").classList.toggle("hidden",!((!hideTitleForMedia&&x.title)||x.text||x.badge||x.price));if(x.type==="image"&&x.mediaUrl){const im=$("#imageMedia");im.src=x.mediaUrl;im.style.objectFit=x.fit||"contain";im.classList.remove("hidden")}if(x.type==="video"&&x.mediaUrl){const v=$("#videoMedia");v.src=x.mediaUrl;v.style.objectFit=x.fit||"contain";v.classList.remove("hidden");if(!weatherShowing)v.play().catch(()=>{})}clock.schedule("slide",next,Math.max(3,Number(x.duration||settings.defaultDuration||10))*1000)}
+function hide(){$("#tideSlide").classList.add("hidden");$("#imageMedia").classList.add("hidden");const v=$("#videoMedia");v.classList.add("hidden");v.pause();v.removeAttribute("src");if(keepAwake)v.load()}
+function show(x){clock.clear("slide");hide();keepAwake?.setContentVideo(x.type==="video"&&!!x.mediaUrl);$("#slideBackground").style.backgroundColor=x.backgroundColor||settings.primaryColor||D.primaryColor;$("#slideBackground").style.backgroundImage=(x.type==="message"&&x.mediaUrl)?`url("${x.mediaUrl}")`:"none";$("#slideCard").style.color=x.textColor||"#fff";const hideTitleForMedia=(x.type==="image"||x.type==="video");$("#title").textContent=hideTitleForMedia?"":(x.title||"");$("#text").textContent=x.text||"";$("#badge").textContent=x.badge||"";$("#badge").classList.toggle("hidden",!x.badge);$("#price").textContent=x.price||"";$("#price").classList.toggle("hidden",!x.price);$("#slideCard").classList.toggle("hidden",!((!hideTitleForMedia&&x.title)||x.text||x.badge||x.price));if(x.type==="image"&&x.mediaUrl){const im=$("#imageMedia");im.src=x.mediaUrl;im.style.objectFit=x.fit||"contain";im.classList.remove("hidden")}if(x.type==="video"&&x.mediaUrl){const v=$("#videoMedia");v.src=x.mediaUrl;v.style.objectFit=x.fit||"contain";v.classList.remove("hidden");if(!weatherShowing)v.play().catch(()=>{})}clock.schedule("slide",next,Math.max(3,Number(x.duration||settings.defaultDuration||10))*1000)}
 function next(){if(urgent?.enabled){show({type:"message",title:urgent.title||"Information",text:urgent.text||"",mediaUrl:urgent.mediaUrl||"",backgroundColor:urgent.backgroundColor||settings.primaryColor,textColor:urgent.textColor||"#fff",duration:10});return}const cs=cats();if(!cs.length){fallback();return}if(ci>=cs.length)ci=0;if(cs[ci].tides){showTidePage();return}const list=listFor(cs[ci].id);if(!list.length){show({type:"message",title:cs[ci].name,text:"",duration:8,backgroundColor:cs[ci].color||settings.primaryColor});return}if(mi>=list.length)mi=0;show(list[mi]);mi=(mi+1)%list.length}
 function fallback(){show({type:"message",title:"Bienvenue",text:"Votre écran boutique est prêt.",duration:10,backgroundColor:settings.primaryColor})}
 async function weatherText(){return weatherService.currentText()}
@@ -41,7 +43,7 @@ async function renderWidgets(){
  if(tidesOnScreen(tideSettings,screenId,"compact")){const card=document.createElement("article");card.className="widget tide-header";renderTides(card,{compact:true});results.push(card);}
  bar.replaceChildren(...results);
 }
-function showTidePage(){clock.clear("slide");hide();$("#slideCard").classList.add("hidden");$("#tideSlide").classList.remove("hidden");renderTides($("#tideSlide"));}
+function showTidePage(){clock.clear("slide");hide();keepAwake?.setContentVideo(false);$("#slideCard").classList.add("hidden");$("#tideSlide").classList.remove("hidden");renderTides($("#tideSlide"));}
 function beginWeather(){
  if(urgent?.enabled||weatherShowing)return;
  weatherShowing=true;clock.pause();$("#videoMedia").pause();
