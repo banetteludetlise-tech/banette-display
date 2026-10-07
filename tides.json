@@ -1,35 +1,7 @@
 {
   "port": "SAINT-MALO",
-  "fetchedAt": "2026-10-06T20:18:41.225Z",
+  "fetchedAt": "2026-10-07T00:41:21.040Z",
   "events": [
-    {
-      "date": "2026-10-06",
-      "time": "04:17",
-      "type": "high",
-      "height": 9.16,
-      "coefficient": 48
-    },
-    {
-      "date": "2026-10-06",
-      "time": "10:53",
-      "type": "low",
-      "height": 4.4,
-      "coefficient": null
-    },
-    {
-      "date": "2026-10-06",
-      "time": "16:44",
-      "type": "high",
-      "height": 9.76,
-      "coefficient": 55
-    },
-    {
-      "date": "2026-10-06",
-      "time": "23:40",
-      "type": "low",
-      "height": 3.61,
-      "coefficient": null
-    },
     {
       "date": "2026-10-07",
       "time": "05:28",
@@ -190,6 +162,34 @@
       "type": "high",
       "height": 12.2,
       "coefficient": 91
+    },
+    {
+      "date": "2026-10-13",
+      "time": "04:00",
+      "type": "low",
+      "height": 1.9,
+      "coefficient": null
+    },
+    {
+      "date": "2026-10-13",
+      "time": "09:21",
+      "type": "high",
+      "height": 12.02,
+      "coefficient": 88
+    },
+    {
+      "date": "2026-10-13",
+      "time": "16:13",
+      "type": "low",
+      "height": 2.02,
+      "coefficient": null
+    },
+    {
+      "date": "2026-10-13",
+      "time": "21:34",
+      "type": "high",
+      "height": 11.83,
+      "coefficient": 83
     }
   ]
 }
