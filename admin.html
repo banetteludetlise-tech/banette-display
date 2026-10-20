@@ -4,13 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#5f0014">
-  <title>Administration — Banette Display V4.5</title>
-  <link rel="stylesheet" href="styles.css?v=4.5.0">
+  <title>Administration — Banette Display V4.6.0</title>
+  <link rel="stylesheet" href="styles.css?v=4.6.0">
 </head>
 <body class="admin-page">
   <header class="admin-header">
     <div>
-      <h1>Banette Display Entreprise <span class="version-label">V4.5</span></h1>
+      <h1>Banette Display Entreprise <span class="version-label">V4.6.0</span></h1>
       <p>Vos contenus et vos écrans, au même endroit</p>
     </div>
     <div class="header-actions">
@@ -41,6 +41,7 @@
         <button class="tab" data-tab="media" type="button">Photos & vidéos</button>
         <button class="tab" data-tab="widgets" type="button">Widgets</button>
         <button class="tab" data-tab="weather" type="button">Météo 3 jours</button>
+        <button class="tab" data-tab="route-rhum" type="button">Route du Rhum</button>
         <button class="tab" data-tab="urgent" type="button">Information principale</button>
         <button class="tab" data-tab="settings" type="button">Réglages</button>
         <button class="tab" data-tab="security" type="button">Sécurité</button>
@@ -279,6 +280,37 @@
         <div class="card"><h2>Aperçu de vos réglages</h2><p>Cet aperçu suit les réglages du formulaire. Enregistrez pour les appliquer aux écrans.</p><article id="adminWeatherPreview" class="weather-panel weather-admin-preview"></article></div>
       </section>
 
+      <section id="tab-route-rhum" class="tab-panel">
+        <div class="card">
+          <h2>Carte interactive · Route du Rhum 2026</h2>
+          <p>La carte GeoVoile s’affiche en plein écran à intervalle régulier. À la fin du passage, le diaporama reprend automatiquement.</p>
+          <form id="routeRhumSettingsForm" class="form-grid two-cols">
+            <label class="check-row full"><input id="routeRhumEnabled" type="checkbox" checked> Activer la carte dans le diaporama</label>
+            <label>Écran
+              <select id="routeRhumScreen">
+                <option value="boutique">Boutique</option>
+                <option value="vitrine">Vitrine</option>
+                <option value="laboratoire">Laboratoire</option>
+                <option value="all">Tous les écrans</option>
+                <option value="custom">Autre écran</option>
+              </select>
+            </label>
+            <label id="routeRhumCustomScreenLabel" class="hidden">Identifiant de l’écran
+              <input id="routeRhumCustomScreen" type="text" pattern="[a-z0-9_-]+" maxlength="50" placeholder="terrasse">
+            </label>
+            <label>Durée d’affichage (secondes) <input id="routeRhumDuration" type="number" min="10" max="300" value="60" required></label>
+            <label>Un passage toutes les… (minutes) <input id="routeRhumInterval" type="number" min="5" max="1440" value="30" required></label>
+            <p id="routeRhumTimingHelp" class="full">Premier passage après 30 minutes, puis un passage toutes les 30 minutes. Les messages prioritaires passent en premier.</p>
+            <div class="form-actions full">
+              <button class="btn primary" type="submit">Enregistrer la carte</button>
+              <a id="routeRhumPreviewLink" href="index.html?screen=boutique&amp;view=route-rhum" target="_blank" rel="noopener" class="btn secondary">Aperçu plein écran Banette</a>
+              <a class="btn secondary" href="https://trimaransvrlazartigue.geovoile.com/routedurhum/2026/viewer/?version=pedagogic" target="_blank" rel="noopener">Ouvrir le lecteur GeoVoile ↗</a>
+            </div>
+            <div id="routeRhumSettingsStatus" class="status full" aria-live="polite"></div>
+          </form>
+        </div>
+      </section>
+
       <section id="tab-urgent" class="tab-panel">
         <div class="card">
           <h2>Information principale prioritaire</h2>
@@ -363,6 +395,6 @@
       </section>
     </section>
   </main>
-  <script type="module" src="admin.js?v=4.5.0"></script>
+  <script type="module" src="admin.js?v=4.6.0"></script>
 </body>
 </html>

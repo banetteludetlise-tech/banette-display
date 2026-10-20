@@ -190,3 +190,10 @@ legend{padding:0 7px;font-weight:800}.weather-field-options{display:flex;gap:14p
 /* Les widgets restent sur une ligne pour ne pas empiéter sur les catégories. */
 .widgets-bar{flex-wrap:nowrap;min-width:0}.widget{min-width:0;flex:0 1 auto}.widget-value{white-space:nowrap}.tide-header{min-width:0}.brand-area{min-width:0;flex-shrink:0}
 @media(min-width:901px) and (max-width:1100px){.widgets-bar{gap:3px}.widget{padding:7px 6px}.widget-value,.tide-header .widget-value{font-size:.8rem}.brand-name{font-size:1.15rem}}
+
+/* Carte Route du Rhum plein écran, interactive. */
+.route-rhum-slide{position:absolute;inset:0;z-index:40;background:#06172b}
+.route-rhum-slide iframe{display:block;width:100%;height:100%;border:0;background:#06172b}
+.route-rhum-open{position:absolute;z-index:1;top:12px;right:12px;padding:10px 14px;border-radius:10px;background:#170d0de8;color:#fff;font-weight:800;text-decoration:none;box-shadow:0 2px 10px #0006}
+.route-rhum-open:focus-visible{outline:3px solid var(--secondary);outline-offset:3px}
+@media(max-width:720px){.route-rhum-open{top:7px;right:7px;padding:8px 10px;font-size:12px}}

@@ -4,6 +4,7 @@ import {startTides, renderTides} from "./tides.js";
 import {tideConfig} from "./tide-model.js";
 import {weatherService,renderWeather} from "./weather.js";
 import {weatherConfig} from "./weather-model.js";
+import {routeRhumConfig} from "./route-rhum-model.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { getFirestore, collection, doc, addDoc, setDoc, deleteDoc, getDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
@@ -81,7 +82,7 @@ function renderCategories(){$("#metricCategories").textContent=categories.length
 function renderMedia(){$("#metricMedia").textContent=media.length;const f=$("#mediaFilter").value,list=f?media.filter(m=>m.categoryId===f):media,w=$("#mediaList");w.innerHTML="";if(!list.length)w.innerHTML="<p>Aucun contenu.</p>";list.forEach(m=>{const c=categories.find(x=>x.id===m.categoryId);w.appendChild(row(m,`${c?.name||"Sans onglet"} · ${m.type||"message"} · ${m.duration||10} s`,()=>editMedia(m.id),()=>removeMedia(m.id),d=>move("media",media,m.id,d)))})}
 function renderWidgets(){$("#metricWidgets").textContent=widgets.length;const w=$("#widgetList");w.innerHTML="";if(!widgets.length)w.innerHTML="<p>Aucun widget.</p>";widgets.forEach(x=>w.appendChild(row({...x,name:x.title||x.type},x.type||"info",()=>editWidget(x.id),()=>removeWidget(x.id),d=>move("widgets",widgets,x.id,d))))}
 async function loadConfig(){const s=await getDoc(doc(db,"config","settings"));if(s.exists()){const x=s.data();["shopName","shopSubtitle","tickerText"].forEach(k=>$("#"+k).value=x[k]||"");$("#logoUrl").value=x.logoUrl&&x.logoUrl!=="assets/logo-placeholder.svg"?x.logoUrl:"";$("#primaryColor").value=x.primaryColor||"#5f0014";$("#secondaryColor").value=x.secondaryColor||"#f0c36b";$("#tickerSpeed").value=x.tickerSpeed||35;$("#defaultDuration").value=x.defaultDuration||10}const u=await getDoc(doc(db,"config","urgent"));if(u.exists()){const x=u.data();$("#urgentTitle").value=x.title||"";$("#urgentText").value=x.text||"";$("#urgentUrl").value=x.mediaUrl||"";$("#urgentBackground").value=x.backgroundColor||"#5f0014";$("#urgentColor").value=x.textColor||"#fff";$("#urgentEnabled").checked=!!x.enabled}}
-function startListeners(){unsubs.push(onSnapshot(doc(db,"config","weather"),s=>fillWeatherSettings(s.exists()?s.data():{}),()=>status($("#weatherSettingsStatus"),"Réglages météo indisponibles. Vérifiez votre connexion.",false)));unsubs.push(onSnapshot(doc(db,"config","tides"),s=>fillTideSettings(s.exists()?s.data():{}),()=>status($("#tideSettingsStatus"),"Réglages des marées indisponibles. Vérifiez la connexion.",false)));unsubs.push(onSnapshot(query(collection(db,"categories"),orderBy("order","asc")),s=>{categories=s.docs.map(d=>({id:d.id,...d.data()}));renderCategories();renderMedia()}));unsubs.push(onSnapshot(query(collection(db,"media"),orderBy("order","asc")),s=>{media=s.docs.map(d=>({id:d.id,...d.data()}));renderMedia()}));unsubs.push(onSnapshot(query(collection(db,"widgets"),orderBy("order","asc")),s=>{widgets=s.docs.map(d=>({id:d.id,...d.data()}));renderWidgets()}));loadConfig()}
+function startListeners(){unsubs.push(onSnapshot(doc(db,"config","weather"),s=>fillWeatherSettings(s.exists()?s.data():{}),()=>status($("#weatherSettingsStatus"),"Réglages météo indisponibles. Vérifiez votre connexion.",false)));unsubs.push(onSnapshot(doc(db,"config","routeRhum"),s=>fillRouteRhumSettings(s.exists()?s.data():{}),()=>status($("#routeRhumSettingsStatus"),"Réglages Route du Rhum indisponibles. Vérifiez votre connexion.",false)));unsubs.push(onSnapshot(doc(db,"config","tides"),s=>fillTideSettings(s.exists()?s.data():{}),()=>status($("#tideSettingsStatus"),"Réglages des marées indisponibles. Vérifiez la connexion.",false)));unsubs.push(onSnapshot(query(collection(db,"categories"),orderBy("order","asc")),s=>{categories=s.docs.map(d=>({id:d.id,...d.data()}));renderCategories();renderMedia()}));unsubs.push(onSnapshot(query(collection(db,"media"),orderBy("order","asc")),s=>{media=s.docs.map(d=>({id:d.id,...d.data()}));renderMedia()}));unsubs.push(onSnapshot(query(collection(db,"widgets"),orderBy("order","asc")),s=>{widgets=s.docs.map(d=>({id:d.id,...d.data()}));renderWidgets()}));loadConfig()}
 
 function openWidgets(){document.querySelector('.tab[data-tab="widgets"]').click()}
 $("#configureTides").addEventListener("click",openWidgets);
@@ -168,3 +169,40 @@ $("#weatherSettingsForm").addEventListener("submit",async e=>{
   finally{if(button)button.disabled=false;}
 });
 fillWeatherSettings({});
+
+function routeRhumFormConfig(){
+  return routeRhumConfig({enabled:$("#routeRhumEnabled").checked,screenId:$("#routeRhumScreen").value==="custom"?$("#routeRhumCustomScreen").value:$("#routeRhumScreen").value,duration:$("#routeRhumDuration").value,intervalMinutes:$("#routeRhumInterval").value});
+}
+function routeRhumFormPreview(){
+  const custom=$("#routeRhumScreen").value==="custom";
+  $("#routeRhumCustomScreenLabel").classList.toggle("hidden",!custom);
+  $("#routeRhumCustomScreen").required=custom;
+  const config=routeRhumFormConfig(),target=config.screenId==="all"?"boutique":config.screenId;
+  $("#routeRhumPreviewLink").href=`index.html?screen=${encodeURIComponent(target)}&view=route-rhum`;
+  $("#routeRhumTimingHelp").textContent=`Premier passage après ${config.intervalMinutes} minutes, puis un passage toutes les ${config.intervalMinutes} minutes. Les messages prioritaires passent en premier.`;
+}
+function fillRouteRhumSettings(value){
+  const config=routeRhumConfig(value);
+  $("#routeRhumEnabled").checked=config.enabled;
+  const known=["boutique","vitrine","laboratoire","all"].includes(config.screenId);
+  $("#routeRhumScreen").value=known?config.screenId:"custom";
+  $("#routeRhumCustomScreen").value=known?"":config.screenId;
+  $("#routeRhumDuration").value=config.duration;
+  $("#routeRhumInterval").value=config.intervalMinutes;
+  routeRhumFormPreview();
+}
+$("#routeRhumSettingsForm").addEventListener("change",routeRhumFormPreview);
+$("#routeRhumDuration").addEventListener("input",routeRhumFormPreview);
+$("#routeRhumInterval").addEventListener("input",routeRhumFormPreview);
+$("#routeRhumCustomScreen").addEventListener("input",routeRhumFormPreview);
+$("#routeRhumSettingsForm").addEventListener("submit",async e=>{
+  e.preventDefault();const config=routeRhumFormConfig(),button=e.submitter;
+  try{
+    if(button)button.disabled=true;
+    await setDoc(doc(db,"config","routeRhum"),{...config,updatedAt:serverTimestamp()},{merge:true});
+    fillRouteRhumSettings(config);
+    status($("#routeRhumSettingsStatus"),"Réglages Route du Rhum enregistrés et synchronisés sur les écrans.");
+  }catch(error){status($("#routeRhumSettingsStatus"),"Enregistrement impossible. Vérifiez votre connexion.",false);console.error(error)}
+  finally{if(button)button.disabled=false}
+});
+fillRouteRhumSettings({});
