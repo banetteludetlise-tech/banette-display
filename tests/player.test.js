@@ -5,6 +5,7 @@ import {readFileSync} from 'node:fs';
 import {PlaybackClock} from '../playback-clock.js';
 import {tideConfig,tidesOnScreen} from '../tide-model.js';
 import {weatherConfig,weatherOnScreen,WeatherSchedule} from '../weather-model.js';
+import {routeRhumConfig,routeRhumOnScreen,RouteRhumSchedule,ROUTE_RHUM_MAP_URL} from '../route-rhum-model.js';
 
 function player(search=''){
  const wakeEvents=[];
@@ -16,7 +17,8 @@ function player(search=''){
  class FakeDate extends Date{constructor(...args){super(...(args.length?args:[time]));}static now(){return time;}}
  class Clock extends PlaybackClock{constructor(){super({now:()=>time,set:(f,m)=>set(f,m),clear:i=>timers.delete(i)});}}
  class Schedule extends WeatherSchedule{constructor(){super(time)}configure(c,s){super.configure(c,s,time)}due(c,s,o){return super.due(c,s,{...o,now:time})}shown(c){super.shown(c,time)}}
- const ctx={mountKeepAwakeTrial:()=>({setContentVideo:value=>wakeEvents.push(value)}),console,Date:FakeDate,URLSearchParams,location:{search},localStorage:{getItem(){return null},setItem(){}},document:{querySelector:node,createElement:element,documentElement:{style:{setProperty(){}}}},window:{addEventListener(){}},setTimeout:(f,m)=>set(f,m),clearTimeout:i=>timers.delete(i),setInterval:(f,m)=>set(f,m,m),PlaybackClock:Clock,WeatherSchedule:Schedule,tideConfig,tidesOnScreen,weatherConfig,weatherOnScreen,weatherService:{configure(){},subscribe(){},currentText(){return '20 °C'}},startTides(){},renderTides(){},renderWeather(){},firebaseConfig:{},initializeApp(){},getFirestore(){},collection:(db,p)=>p,doc:(db,c,i)=>c+'/'+i,query:x=>x,orderBy(){},onSnapshot:(path,fn)=>snapshots.set(path,fn)};
+ class RouteSchedule extends RouteRhumSchedule{constructor(){super(time)}configure(c,s){super.configure(c,s,time)}due(c,s,o){return super.due(c,s,{...o,now:time})}shown(c){super.shown(c,time)}}
+ const ctx={mountKeepAwakeTrial:()=>({setContentVideo:value=>wakeEvents.push(value)}),console,Date:FakeDate,URLSearchParams,location:{search},localStorage:{getItem(){return null},setItem(){}},document:{querySelector:node,createElement:element,documentElement:{style:{setProperty(){}}}},window:{addEventListener(){}},setTimeout:(f,m)=>set(f,m),clearTimeout:i=>timers.delete(i),setInterval:(f,m)=>set(f,m,m),PlaybackClock:Clock,WeatherSchedule:Schedule,tideConfig,tidesOnScreen,weatherConfig,weatherOnScreen,routeRhumConfig,routeRhumOnScreen,RouteRhumSchedule:RouteSchedule,ROUTE_RHUM_MAP_URL,weatherService:{configure(){},subscribe(){},currentText(){return '20 °C'}},startTides(){},renderTides(){},renderWeather(){},firebaseConfig:{},initializeApp(){},getFirestore(){},collection:(db,p)=>p,doc:(db,c,i)=>c+'/'+i,query:x=>x,orderBy(){},onSnapshot:(path,fn)=>snapshots.set(path,fn)};
  vm.runInNewContext(readFileSync(new URL('../screen.js',import.meta.url),'utf8').replace(/^import .*;\r?\n/gm,''),ctx);
  const update=(path,value)=>snapshots.get(path)(path.includes('/')?{exists:()=>value!=null,data:()=>value}:{docs:value.map(x=>({id:x.id,data:()=>x}))});
  return{node,advance,update,wakeEvents};
@@ -62,4 +64,31 @@ test('Essai : marées et urgence restent des pages sans vidéo',()=>{
  const p=player('?keepawake=test&view=tides');assert.equal(p.wakeEvents.at(-1),false);
  p.update('config/urgent',{enabled:true,title:'Urgent'});assert.equal(p.wakeEvents.at(-1),false);
  assert.equal(p.node('#title').textContent,'Urgent');
+});
+
+test('Lecteur intégré: carte Route du Rhum toutes les 30 min, retour au diaporama après 60 s',()=>{
+ const p=player();p.update('config/tides',{enabled:false});p.update('config/weather',{enabled:false});
+ p.update('categories',[{id:'bread',name:'Pains',duration:3600}]);
+ p.update('media',[{id:'one',categoryId:'bread',type:'message',title:'Premier',duration:3600}]);
+ p.advance(1799999);assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),true);
+ p.advance(1);assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),false);
+ assert.equal(p.node('#routeRhumFrame').src,'https://trimaransvrlazartigue.geovoile.com/routedurhum/2026/viewer/?version=pedagogic');
+ assert.equal(p.node('#videoMedia').paused,true);const title=p.node('#title').textContent;
+ p.advance(59999);assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),false);
+ p.advance(1);assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),true);
+ assert.equal(p.node('#routeRhumFrame').src,'');assert.equal(p.node('#title').textContent,title);
+ p.advance(1739999);assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),true);
+ p.advance(1);assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),false);
+});
+test('Lecteur intégré: Route du Rhum suit les écrans, urgence et aperçu plein écran',()=>{
+ const other=player('?screen=vitrine');other.update('config/tides',{enabled:false});other.update('config/weather',{enabled:false});other.advance(1800000);
+ assert.equal(other.node('#routeRhumSlide').classList.contains('hidden'),true);
+ const p=player();p.update('config/tides',{enabled:false});p.update('config/weather',{enabled:false});p.advance(1800000);
+ assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),false);
+ p.update('config/urgent',{enabled:true,title:'Urgence'});assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),true);
+ assert.equal(p.node('#routeRhumFrame').src,'');assert.equal(p.node('#title').textContent,'Urgence');
+ const preview=player('?screen=vitrine&view=route-rhum');preview.advance(500);
+ assert.equal(preview.node('#routeRhumSlide').classList.contains('hidden'),false);
+ preview.update('config/routeRhum',{enabled:false});preview.advance(120000);
+ assert.equal(preview.node('#routeRhumSlide').classList.contains('hidden'),false);
 });

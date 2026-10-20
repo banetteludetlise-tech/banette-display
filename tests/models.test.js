@@ -4,6 +4,7 @@ import {parisNow,validateTides,tideSummary,tideConfig,tidesOnScreen} from '../ti
 import {parseShomWidget} from '../scripts/shom-parser.mjs';
 import {dailyForecast,dayKeys,weatherConfig,WeatherSchedule} from '../weather-model.js';
 import {PlaybackClock} from '../playback-clock.js';
+import {routeRhumConfig,routeRhumOnScreen,RouteRhumSchedule} from '../route-rhum-model.js';
 
 const now=new Date('2026-09-27T10:00:00Z');
 const tide={port:'SAINT-MALO',fetchedAt:now.toISOString(),events:[
@@ -75,4 +76,16 @@ test('Diaporama: pause exacte des médias et catégories, nouveaux délais penda
  const advance=ms=>{const end=time+ms;while(true){const next=[...jobs].filter(([,j])=>j.at<=end).sort((a,b)=>a[1].at-b[1].at)[0];if(!next)break;time=next[1].at;jobs.delete(next[0]);next[1].fn();}time=end;};
  clock.schedule('slide',()=>events.push('slide'),10000);clock.schedule('category',()=>events.push('category'),60000);advance(5000);clock.pause();advance(20000);assert.deepEqual(events,[]);clock.resume();advance(4999);assert.deepEqual(events,[]);advance(1);assert.deepEqual(events,['slide']);advance(50000);assert.deepEqual(events,['slide','category']);
  clock.pause();clock.schedule('new',()=>events.push('new'),3000);advance(20000);clock.resume();advance(3000);assert.equal(events.at(-1),'new');
+});
+
+test('Route du Rhum: passage initial après 30 minutes, cadence entre deux débuts, écran et priorités',()=>{
+ const config=routeRhumConfig(),s=new RouteRhumSchedule(0);s.configure(config,'boutique',0);
+ assert.equal(config.enabled,true);assert.equal(config.screenId,'boutique');assert.equal(config.duration,60);assert.equal(config.intervalMinutes,30);
+ assert.equal(s.due(config,'boutique',{now:1799999}),false);assert.equal(s.due(config,'boutique',{now:1800000}),true);
+ s.shown(config,1800000);assert.equal(s.due(config,'boutique',{now:1859999}),false);assert.equal(s.due(config,'boutique',{now:3600000}),true);
+ assert.equal(s.due(config,'vitrine',{now:3600000}),false);assert.equal(s.due(config,'boutique',{now:3600000,urgent:true}),false);
+ assert.equal(s.due(config,'boutique',{now:3600000,showing:true}),false);assert.equal(s.due(config,'boutique',{now:3600000,preview:true}),false);
+ assert.equal(routeRhumOnScreen({...config,screenId:'all'},'vitrine'),true);
+ assert.equal(routeRhumConfig({duration:1,intervalMinutes:2}).duration,10);
+ assert.equal(routeRhumConfig({intervalMinutes:2000}).intervalMinutes,1440);
 });
