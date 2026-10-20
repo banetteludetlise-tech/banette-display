@@ -1,6 +1,10 @@
-# Banette Display V4.5.1 Entreprise
+# Banette Display V4.6.0 Entreprise
 
-Version actuelle : GitHub Pages + Firebase + Cloudinary, issue de la V4.3/V4.4 existante. Voir les nouveautés et réglages V4.5 plus bas.
+Version actuelle : V4.6.0 sur GitHub Pages + Firebase + Cloudinary, issue de la V4.3/V4.4 existante. Voir les nouveautés et réglages ci-dessous.
+
+## V4.6.0 — carte interactive Route du Rhum
+
+La carte interactive de la Route du Rhum 2026 est intégrée au diaporama depuis le lecteur pédagogique GeoVoile. Par défaut, elle apparaît en plein écran sur l’écran Boutique après 30 minutes, reste affichée 60 secondes, puis le diaporama reprend. Les vidéos et les délais de catégorie sont mis en pause pendant son affichage ; les annonces prioritaires passent en premier. Ces valeurs et l’écran cible sont modifiables dans l’onglet **Route du Rhum** de l’administration. Le lien **Aperçu plein écran Banette** ouvre la carte en continu pour vérifier le rendu ; **Ouvrir le lecteur GeoVoile** donne accès directement à la source.
 
 ## V4.5.1 — essai anti-veille facultatif
 
@@ -47,6 +51,7 @@ Utilisez l’adresse e-mail et le mot de passe créés dans Firebase Authenticat
 - téléchargement direct vers Cloudinary ;
 - widgets ;
 - météo ;
+- carte interactive Route du Rhum 2026 ;
 - date et heure ;
 - informations et rendez-vous ;
 - message principal prioritaire ;
