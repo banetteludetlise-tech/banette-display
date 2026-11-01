@@ -70,13 +70,14 @@ test('Lecteur intégré: carte Route du Rhum toutes les 30 min, retour au diapor
  const p=player();p.update('config/tides',{enabled:false});p.update('config/weather',{enabled:false});
  p.update('categories',[{id:'bread',name:'Pains',duration:3600}]);
  p.update('media',[{id:'one',categoryId:'bread',type:'message',title:'Premier',duration:3600}]);
+ assert.equal(p.node('#routeRhumFrame').src,ROUTE_RHUM_MAP_URL);
  p.advance(1799999);assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),true);
  p.advance(1);assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),false);
- assert.equal(p.node('#routeRhumFrame').src,'https://trimaransvrlazartigue.geovoile.com/routedurhum/2026/viewer/?version=pedagogic');
+ assert.equal(p.node('#routeRhumFrame').src,ROUTE_RHUM_MAP_URL);
  assert.equal(p.node('#videoMedia').paused,true);const title=p.node('#title').textContent;
  p.advance(59999);assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),false);
  p.advance(1);assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),true);
- assert.equal(p.node('#routeRhumFrame').src,'');assert.equal(p.node('#title').textContent,title);
+ assert.equal(p.node('#routeRhumFrame').src,ROUTE_RHUM_MAP_URL);assert.equal(p.node('#title').textContent,title);
  p.advance(1739999);assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),true);
  p.advance(1);assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),false);
 });
@@ -86,7 +87,7 @@ test('Lecteur intégré: Route du Rhum suit les écrans, urgence et aperçu plei
  const p=player();p.update('config/tides',{enabled:false});p.update('config/weather',{enabled:false});p.advance(1800000);
  assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),false);
  p.update('config/urgent',{enabled:true,title:'Urgence'});assert.equal(p.node('#routeRhumSlide').classList.contains('hidden'),true);
- assert.equal(p.node('#routeRhumFrame').src,'');assert.equal(p.node('#title').textContent,'Urgence');
+ assert.equal(p.node('#routeRhumFrame').src,ROUTE_RHUM_MAP_URL);assert.equal(p.node('#title').textContent,'Urgence');
  const preview=player('?screen=vitrine&view=route-rhum');preview.advance(500);
  assert.equal(preview.node('#routeRhumSlide').classList.contains('hidden'),false);
  preview.update('config/routeRhum',{enabled:false});preview.advance(120000);
