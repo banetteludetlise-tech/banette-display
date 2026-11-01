@@ -16,6 +16,8 @@ let settings=cache("settings",D),categories=cache("categories",[]),media=cache("
 const clock=new PlaybackClock(),params=new URLSearchParams(location.search),screenId=(params.get("screen")||"boutique").toLowerCase(),view=params.get("view");
 const keepAwake=params.get("keepawake")==="test"?mountKeepAwakeTrial():null;
 let tideSettings=tideConfig(cache("tides",{})),weatherSettings=weatherConfig(cache("weather_settings",{})),weatherShowing=false,weatherEndTimer,routeRhumSettings=routeRhumConfig(cache("route_rhum",{})),routeRhumShowing=false,routeRhumEndTimer,widgetGeneration=0;
+const routeRhumFrame=$("#routeRhumFrame");
+routeRhumFrame.src=ROUTE_RHUM_MAP_URL;
 const weatherSchedule=new WeatherSchedule();
 weatherSchedule.configure(weatherSettings,screenId);
 const routeRhumSchedule=new RouteRhumSchedule();
@@ -63,14 +65,14 @@ function endWeather(){
 function beginRouteRhum(){
  if(urgent?.enabled||routeRhumShowing)return;
  routeRhumShowing=true;clock.pause();$("#videoMedia").pause();
- $("#routeRhumFrame").src=ROUTE_RHUM_MAP_URL;$("#routeRhumSlide").classList.remove("hidden");
+ $("#routeRhumSlide").classList.remove("hidden");
  routeRhumSchedule.shown(routeRhumSettings);
  if(view!=="route-rhum")routeRhumEndTimer=setTimeout(endRouteRhum,routeRhumSettings.duration*1000);
 }
 function endRouteRhum(){
  clearTimeout(routeRhumEndTimer);
- if(!routeRhumShowing){$("#routeRhumSlide").classList.add("hidden");$("#routeRhumFrame").removeAttribute("src");return;}
- routeRhumShowing=false;$("#routeRhumSlide").classList.add("hidden");$("#routeRhumFrame").removeAttribute("src");clock.resume();
+ if(!routeRhumShowing){$("#routeRhumSlide").classList.add("hidden");return;}
+ routeRhumShowing=false;$("#routeRhumSlide").classList.add("hidden");clock.resume();
  const v=$("#videoMedia");if(!v.classList.contains("hidden")&&!urgent?.enabled&&!weatherShowing)v.play().catch(()=>{});
 }
 weatherService.configure(weatherSettings);
