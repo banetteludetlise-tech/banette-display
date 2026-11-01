@@ -1,4 +1,4 @@
-export const ROUTE_RHUM_MAP_URL = "https://trimaransvrlazartigue.geovoile.com/routedurhum/2026/viewer/?version=pedagogic";
+export const ROUTE_RHUM_MAP_URL = "https://carto.routedurhum.com";
 
 export const DEFAULT_ROUTE_RHUM = Object.freeze({
   enabled: true,
